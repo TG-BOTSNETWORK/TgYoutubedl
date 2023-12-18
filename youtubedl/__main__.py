@@ -6,7 +6,7 @@ async def main():
     try:
         await ytdl.start()
         print("[Bot] - Ytdl Bot Started")
-        await ytdl.join_chat("https://t.me/TgBotsNetwork")
+        await ytdl.join_chat("TgBotsNetwork")
         print("[Join chat] - Successfully joined in chat")
     except Exception as e:
         print(f"{e}")
