@@ -6,7 +6,7 @@ async def main():
     try:
         await ytdl.start()
         print("[Bot] - Ytdl Bot Started")
-        await ytdl.send_message("5857041668", "Bot Started my dear owner bhai!")
+        await ytdl.send_message(chat_id="@my_name_is_nobitha", "Bot Started my dear owner bhai!")
         print("[Owner] - Started message sented to owner.")
     except Exception as e:
         print(f"{e}")
