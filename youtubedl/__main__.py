@@ -2,11 +2,11 @@ import asyncio
 from hydrogram import Client, idle
 from youtubedl import ytdl
 
-def main():
+async def main():
     try:
-        ytdl.run()
+        await ytdl.run()
         print("[Bot] - Ytdl Bot Started")
-        ytdl.join_chat("t.me/TgBotsNetwork")
+        await ytdl.join_chat("t.me/TgBotsNetwork")
         print("[Join chat] - Successfully joined in chat")
     except Exception as e:
         print(f"{e}")
