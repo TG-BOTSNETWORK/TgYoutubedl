@@ -4,7 +4,7 @@ from youtubedl import ytdl
 
 async def main():
     try:
-        await ytdl.run()
+        await ytdl.start()
         print("[Bot] - Ytdl Bot Started")
         await ytdl.join_chat("t.me/TgBotsNetwork")
         print("[Join chat] - Successfully joined in chat")
