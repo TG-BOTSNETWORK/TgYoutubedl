@@ -3,3 +3,5 @@ TgCrypto
 youtube-search-python
 search_engine_parser
 git+https://github.com/yt-dlp/yt-dlp@master
+python-dotenv
+pillow==9.5.0
