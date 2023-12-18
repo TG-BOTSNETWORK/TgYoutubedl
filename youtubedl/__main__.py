@@ -7,9 +7,9 @@ async def main()
     print("[Bot] - Ytdl Bot Started")
     await ytdl.join_chat("t.me/TgBotsNetwork")
     print("[Join chat] - Successfully joined in chat")
-except Exception as e:
-    print(f"{e}")
-    await idle()
+        except Exception as e:
+            print(f"{e}")
+        await idle()
 
 
 if __name__ == "__main__":
