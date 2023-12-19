@@ -18,7 +18,7 @@ VIDEO_QUALITIES = ["144p", "240p", "360p", "480p", "720p", "1080p"]
 
 def download_media(url, quality, is_audio=True):
     ydl_opts = {
-        "format": f"bestaudio[abr={quality}]" if is_audio else f"bestvideo[height={quality}]",
+        "format": "bestaudio[abr={0}]".format(quality) if is_audio else "bestvideo[height={0}]".format(quality),
         "verbose": True,
         "geo-bypass": True,
         "nocheckcertificate": True,
@@ -27,14 +27,23 @@ def download_media(url, quality, is_audio=True):
 
     try:
         with YoutubeDL(ydl_opts) as ydl:
-            info_dict = ydl.extract_info(url, download=False)
-            formats = info_dict.get('formats', [])
-            print("Available Formats:")
-            for fmt in formats:
-                print(f"{fmt['format_id']}: {fmt['resolution'] if 'resolution' in fmt else fmt['abr']}")
             ydl.download([url])
+    except yt_dlp.utils.ExtractorError as e:
+        print(f"Error extracting information: {e}")
+        print("Available formats:")
+        with YoutubeDL() as ydl:
+            info = ydl.extract_info(url, download=False)
+            for format in info.get('formats', []):
+                print(format['format_id'], format['ext'], format.get('quality'))
+        raise
     except Exception as e:
         print(f"Error downloading media: {e}")
+        if "Requested format is not available" in str(e):
+            print("Available formats:")
+            with YoutubeDL() as ydl:
+                info = ydl.extract_info(url, download=False)
+                for format in info.get('formats', []):
+                    print(format['format_id'], format['ext'], format.get('quality'))
         raise
 
 def get_thumbnail(url):
