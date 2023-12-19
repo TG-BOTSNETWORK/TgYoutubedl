@@ -14,7 +14,7 @@ start_keyboard = KeyboardMarkup([
       ])
 
 @ytdl.on_message(filters.command("start"))
-async def(client: Client, msg: Msg):
+async def(client, msg: Msg):
     await msg.reply_text( 
         text=f"**👋Hello {}**\nWelcome iam an Youtube downloader bot i can download a youtube videos or audios with searching and providing links and playlist links.👀\n\n**Developed By**: @TgBotsNetwork".format(msg.from_user.mention()),
         reply_markup=start_keyboard
