@@ -44,9 +44,9 @@ def handle_text_message(client, message):
         video_info = get_video_info(results[0]["id"])
         thumbnail_url = video_info["thumbnails"][-1]["url"]
 
-        reply_markup = InlineKeyboardMarkup([
-            [InlineKeyboardButton("Video", callback_data=f"download_video:{results[0]['id']}:video"),
-             InlineKeyboardButton("Audio", callback_data=f"download_video:{results[0]['id']}:audio")]
+        reply_markup = Markup([
+            [Button("Video", callback_data=f"download_video:{results[0]['id']}:video"),
+             Button("Audio", callback_data=f"download_video:{results[0]['id']}:audio")]
         ])
 
         ytdl.send_photo(chat_id=message.chat.id, photo=thumbnail_url,
