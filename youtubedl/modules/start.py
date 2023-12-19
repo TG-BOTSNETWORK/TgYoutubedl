@@ -6,12 +6,13 @@ from hydrogram.types import (
 )
 from youtubedl import ytdl
 
-start_keyboard = KeyboardMarkup([
+start_keyboard = KeyboardMarkup([[
     KeyboardButton("📥 Normal Download", callback_data="nrml_dl"),
     KeyboardButton("📂 Playlist Download", callback_data="plylist_dl"),
     ],[
     KeyboardButton("⚙️ Settings", callback_data="settings")
-    ])
+    ]]
+    )
 
 
 @ytdl.on_message(filters.command("start"))
