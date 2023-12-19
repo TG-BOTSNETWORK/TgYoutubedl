@@ -11,7 +11,7 @@ start_keyboard = KeyboardMarkup([[
     KeyboardButton("📥 Normal Download", callback_data="nrml_dl"),
     KeyboardButton("Playlist Download 📂 ", callback_data="plylist_dl"),
     ],[
-    KeyboardButton("❐About", callback_data="about"),
+    KeyboardButton("❐ About", callback_data="about"),
     KeyboardButton("Help 📗 ", callback_data="help"),
     ],[
     KeyboardButton("⚙️ Settings", callback_data="settings")
@@ -26,7 +26,7 @@ help_keyboard = KeyboardMarkup([[
 @ytdl.on_message(filters.command("start") & filters.private)
 async def start(client: Client, msg: Msg):
     await msg.reply_text(
-        text=f"**👋Hello {msg.from_user.mention()}**\nWelcome, I am a YouTube downloader bot. I can download YouTube videos or audios by searching and providing links and playlist links.👀\n\n**Developed By**: @TgBotsNetwork",
+        text=f"**👋Hello {msg.from_user.mention()}**\n\nWelcome, I am a YouTube downloader bot. I can download YouTube videos or audios by searching and providing links and playlist links.👀\n\n**Developed By**: @TgBotsNetwork",
         reply_markup=start_keyboard
     )
 
@@ -40,7 +40,7 @@ async def help(client: Client, msg: Msg):
 @ytdl.on_callback_query(filters.regex("back"))
 async def back_callback(client: Client, callback_query: BackQuery):
     await callback_query.edit_message_text(
-        text=f"**👋Hello {msg.from_user.mention()}**\nWelcome, I am a YouTube downloader bot. I can download YouTube videos or audios by searching and providing links and playlist links.👀\n\n**Developed By**: @TgBotsNetwork",
+        text=f"**👋Hello {callback_query.msg.from_user.mention()}**\n\nWelcome, I am a YouTube downloader bot. I can download YouTube videos or audios by searching and providing links and playlist links.👀\n\n**Developed By**: @TgBotsNetwork",
         reply_markup=start_keyboard
     )
 
