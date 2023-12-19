@@ -35,7 +35,7 @@ def download_video(video_id, quality="best"):
         ydl.download([url])
 
 
-@app.on_message(filters.private & filters.text)
+@ytdl.on_message(filters.private & filters.text)
 def handle_text_message(client, message):
     query = message.text.strip()
     results = YoutubeSearch(query, max_results=1).to_dict()
@@ -49,16 +49,16 @@ def handle_text_message(client, message):
              InlineKeyboardButton("Audio", callback_data=f"download_video:{results[0]['id']}:audio")]
         ])
 
-        client.send_photo(chat_id=message.chat.id, photo=thumbnail_url,
+        ytdl.send_photo(chat_id=message.chat.id, photo=thumbnail_url,
                           caption=f"{video_info['title']}\n\nChoose download type:", reply_markup=reply_markup)
 
 
-@app.on_callback_query(filters.regex(r"download_video:(\S+):(\S+)"))
+@ytdl.on_callback_query(filters.regex(r"download_video:(\S+):(\S+)"))
 def download_callback(client, callback_query):
     _, video_id, download_type = callback_query.data.split(":")
     download_video(video_id, "best" if download_type == "video" else "bestaudio")
 
     file_path = f"{video_id}.{'mp4' if download_type == 'video' else 'webm'}"
-    client.send_document(chat_id=callback_query.message.chat.id, document=file_path,
+    ytdl.send_document(chat_id=callback_query.message.chat.id, document=file_path,
                          caption="Here is your video/audio.")
     os.remove(file_path)
