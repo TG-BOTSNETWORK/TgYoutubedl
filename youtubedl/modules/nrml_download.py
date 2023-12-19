@@ -10,6 +10,7 @@ from youtubedl import ytdl
 import yt_dlp
 import re
 import asyncio
+import time
 
 DOWNLOAD_DIR = "downloads/"
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
@@ -74,9 +75,9 @@ def download_video_callback(client, callback_query):
     _, video_id, download_type = callback_query.data.split(":")
     chat_id = callback_query.message.chat.id
     msg = callback_query.message.edit_text("Wait! Your Video is being found...")
-    asyncio.sleep(0.1)
+    time.sleep(0.1)
     msg.edit_text("Found your Video....")
-    asyncio.sleep(0.1)
+    time.sleep(0.1)
     msg.edit_text("URL checking....")
     if download_type == "video":
         download_video(video_id, "best")
@@ -85,9 +86,9 @@ def download_video_callback(client, callback_query):
                 ]]
                 )
         file_path = f"{DOWNLOAD_DIR}/{video_info['title']}.mp4"
-        asyncio.sleep(0.1)
+        time.sleep(0.1)
         msg.edit_text(chat_id, text="Uploading your video...")
-        asyncio.sleep(2)
+        time.sleep(2)
         ytdl.send_video(chat_id, video=file_path, caption=f"Here is your video: {video_info['title']}\n\nDeveloped By: @my_name_is_nobitha", reply_markup=share_keyboard)
         os.remove(file_path)
 
@@ -96,18 +97,18 @@ def download_audio_callback(client, callback_query):
     video_id = callback_query.matches[0].group(1)
     chat_id = callback_query.message.chat.id
     msg = callback_query.message.edit_text("Wait! Your audio is being found...")
-    asyncio.sleep(0.1)
+    time.sleep(0.1)
     msg.edit_text("Found your audio....")
-    asyncio.sleep(0.1)
+    time.sleep(0.1)
     msg.edit_text("URL checking....")
     download_audio(video_id)
     share_keyboard = Markup([[
         Button("Youtube", url=f"https://www.youtube.com/watch?v={video_id}")
     ]])
     file_path = f"{DOWNLOAD_DIR}/{video_info['title']}.mp3"
-    asyncio.sleep(0.1)
+    time.sleep(0.1)
     msg.edit_text("Uploading Your Audio....")
-    asyncio.sleep(2)
+    time.sleep(2)
     if os.path.exists(file_path):
         with open(file_path, "rb") as audio_file:
             ytdl.send_audio(chat_id, audio=audio_file, caption=f"Here is your audio: {video_info['title']}\n\nDeveloped By: @my_name_is_nobitha", reply_markup=share_keyboard)
