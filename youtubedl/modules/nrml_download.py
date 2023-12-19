@@ -8,14 +8,22 @@ from hydrogram.types import (
 )
 from youtube_search import YoutubeSearch
 from yt_dlp import YoutubeDL
-from PIL import Image
-from youtubedl import ytdl
 
 DOWNLOAD_DIR = "downloads/"
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
 AUDIO_QUALITIES = ["low", "medium", "high"]
 VIDEO_QUALITIES = ["144p", "240p", "360p", "480p", "720p", "1080p"]
+
+ydl_opts = {
+    "format": "best",
+    "verbose": True,
+    "geo-bypass": True,
+    "nocheckcertificate": True,
+    "outtmpl": DOWNLOAD_DIR + "%(title)s.%(ext)s",
+}
+
+ydl = YoutubeDL(ydl_opts)
 
 def download_media(url, quality, is_audio=True):
     options = {
@@ -37,7 +45,7 @@ def get_thumbnail(url):
         thumbnail_url = info_dict.get("thumbnail", "")
         return thumbnail_url
 
-@ytdl.on_message(filters.incoming & filters.text)
+@ytdl.on_message(filters.incoming)
 async def handle_message(client: Client, msg: Msg):
     text = msg.text
     if "youtube.com" in text or "youtu.be" in text:
