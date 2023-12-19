@@ -6,7 +6,7 @@ from hydrogram.types import (
     Message as Msg,
     CallbackQuery
 )
-from youtube_search  import YoutubeSearch
+from youtube_search import YoutubeSearch
 from yt_dlp import YoutubeDL
 from PIL import Image
 from youtubedl import ytdl
@@ -19,9 +19,15 @@ VIDEO_QUALITIES = ["144p", "240p", "360p", "480p", "720p", "1080p"]
 
 def download_media(url, quality, is_audio=True):
     options = {
-        "format": f"bestaudio[abr={quality}]" if is_audio else f"bestvideo[height={quality}]",
+        "format": None,  # Let yt_dlp choose the best format
         "outtmpl": DOWNLOAD_DIR + "%(title)s.%(ext)s",
     }
+
+    if is_audio:
+        options["format"] = f"bestaudio[abr={quality}]"
+    else:
+        options["format"] = f"bestvideo[height={quality}]"
+
     with YoutubeDL(options) as ydl:
         ydl.download([url])
 
@@ -73,8 +79,13 @@ async def handle_callback_query(client: Client, query: CallbackQuery):
     data = query.data
     user_id = query.from_user.id
     quality, video_id = data.split("_")
-    download_media(f"https://www.youtube.com/watch?v={video_id}", quality, is_audio=("low" in quality or "medium" in quality or "high" in quality))
-    await query.message.reply_video(
-        video=DOWNLOAD_DIR + f"{video_id}.mp4",
-        caption="This is your requested video."
-    )
+    
+    try:
+        download_media(f"https://www.youtube.com/watch?v={video_id}", quality, is_audio=("low" in quality or "medium" in quality or "high" in quality))
+        await query.message.reply_video(
+            video=DOWNLOAD_DIR + f"{video_id}.mp4",
+            caption="This is your requested video."
+        )
+    except Exception as e:
+        print(f"Error downloading media: {e}")
+        await query.message.reply_text("Error downloading media. Please try again.")
