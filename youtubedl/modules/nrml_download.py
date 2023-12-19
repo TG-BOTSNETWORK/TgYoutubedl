@@ -13,8 +13,6 @@ import re
 DOWNLOAD_DIR = "downloads/"
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
-AUDIO_QUALITIES = ["low", "medium", "high"]
-VIDEO_QUALITIES = ["144p", "240p", "360p", "480p", "720p", "1080p"]
 
 def extract_video_id(url):
     match = re.search(r"(?:v=|\/videos\/|embed\/|youtu.be\/|\/v\/|\/e\/|watch\?v=|&v=|%2Fvideos%2F|%2Fwatch%3Fv%3D|%2F|\?v=)([^#\\&\?]*)(?:[\w-]+)?", url)
@@ -87,19 +85,23 @@ def download_video_callback(client, callback_query):
 def download_audio_callback(client, callback_query):
     video_id = callback_query.matches[0].group(1)
     chat_id = callback_query.message.chat.id
-    msg = callback_query.edit_message_text("Wait! Your audio is being founding...")
-    msg.edit_message_text("Founded your audio....")
-    msg.edit_message_text("Url checking....")
+    msg = callback_query.message.edit_text("Wait! Your audio is being found...")
+
+    msg.edit_text("Found your audio....")
+    msg.edit_text("URL checking....")
+
     download_audio(video_id)
+
     share_keyboard = Markup([[
-            Button("Youtube", url=f"https://www.youtube.com/watch?v={video_id}")
-            ]]
-            )
+        Button("Youtube", url=f"https://www.youtube.com/watch?v={video_id}")
+    ]])
+
     file_path = f"{callback_query.message.from_user.first_name}.mp3"
-    msg.edit_message_text("Uploading Your Audio....")
+    msg.edit_text("Uploading Your Audio....")
+
     if os.path.exists(file_path):
         with open(file_path, "rb") as audio_file:
-            ytdl.send_audio(chat_id, audio=audio_file, caption="Here is your audio.\n\nDeveleoped By: @my_name_is_nobitha", reply_markup=share_keyboard)
+            ytdl.send_audio(chat_id, audio=audio_file, caption="Here is your audio.\n\nDeveloped By: @my_name_is_nobitha", reply_markup=share_keyboard)
         os.remove(file_path)
     else:
         ytdl.send_message(chat_id, text="Error: Audio file not found.")
