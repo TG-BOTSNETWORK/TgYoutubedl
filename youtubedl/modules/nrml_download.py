@@ -33,7 +33,7 @@ def download_video(video_id, quality="best"):
     url = f"https://www.youtube.com/watch?v={video_id}"
     ydl_opts = {
         "format": quality,
-        "outtmpl": f"{DOWNLOAD_DIR}/{video_id}.%(ext)s",  # Save in DOWNLOAD_DIR
+        "outtmpl": f"{DOWNLOAD_DIR}/{video_id}.%(ext)s",  
     }
     with YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
@@ -73,24 +73,32 @@ def download_video_callback(client, callback_query):
         ytdl.send_message(chat_id, text="Wait! Your video is being found...")
 
         download_video(video_id, "best")
+        share_keyboard = Markup([[
+                Button("Share", url=f"https:t.me/share/url?url=https://www.youtube.com/watch?v={video_id}")
+                ]]
+                )
 
         file_path = f"{DOWNLOAD_DIR}/{video_id}.mp4"
         ytdl.send_message(chat_id, text="Uploading your video...")
-        ytdl.send_video(chat_id, video=file_path, caption="Here is your video.")
+        ytdl.send_video(chat_id, video=file_path, caption="Here is your video.\n\nDeveleoped By: @my_name_is_nobitha", reply_markup=share_keyboard)
         os.remove(file_path)
 
 @ytdl.on_callback_query(filters.regex(r"download_audio:(\S+)"))
 def download_audio_callback(client, callback_query):
     video_id = callback_query.matches[0].group(1)
     chat_id = callback_query.message.chat.id
-    ytdl.send_message(chat_id, text="Wait! Your audio is being found...")
+    msg = callback_query.edit_message_text("Wait! Your audio is being founding...")
 
     download_audio(video_id)
-
-    file_path = f"{DOWNLOAD_DIR}/{video_id}.mp3"
+    share_keyboard = Markup([[
+            Button("Share", url=f"https:t.me/share/url?url=https://www.youtube.com/watch?v={video_id}")
+            ]]
+            )
+    file_path = f"{callback_query.messgae.from_user.first_name}.mp3"
+    msg.edit_message_text("Uploading Your Audio....")
     if os.path.exists(file_path):
         with open(file_path, "rb") as audio_file:
-            ytdl.send_audio(chat_id, audio=audio_file, caption="Here is your audio.")
+            ytdl.send_audio(chat_id, audio=audio_file, caption="Here is your audio.\n\nDeveleoped By: @my_name_is_nobitha", reply_markup=share_keyboard)
         os.remove(file_path)
     else:
         ytdl.send_message(chat_id, text="Error: Audio file not found.")
