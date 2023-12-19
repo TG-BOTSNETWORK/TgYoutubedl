@@ -74,7 +74,7 @@ def download_video_callback(client, callback_query):
 
         download_video(video_id, "best")
         share_keyboard = Markup([[
-                Button("Share", url=f"https:t.me/share/url?url=https://www.youtube.com/watch?v={video_id}")
+                Button("Youtube", url=f"https://www.youtube.com/watch?v={video_id}")
                 ]]
                 )
 
@@ -91,10 +91,10 @@ def download_audio_callback(client, callback_query):
 
     download_audio(video_id)
     share_keyboard = Markup([[
-            Button("Share", url=f"https:t.me/share/url?url=https://www.youtube.com/watch?v={video_id}")
+            Button("Youtube", url=f"https://www.youtube.com/watch?v={video_id}")
             ]]
             )
-    file_path = f"{callback_query.messgae.from_user.first_name}.mp3"
+    file_path = f"{callback_query.messgage.from_user.first_name}.mp3"
     msg.edit_message_text("Uploading Your Audio....")
     if os.path.exists(file_path):
         with open(file_path, "rb") as audio_file:
