@@ -27,6 +27,11 @@ def download_media(url, quality, is_audio=True):
 
     try:
         with YoutubeDL(ydl_opts) as ydl:
+            info_dict = ydl.extract_info(url, download=False)
+            formats = info_dict.get('formats', [])
+            print("Available Formats:")
+            for fmt in formats:
+                print(f"{fmt['format_id']}: {fmt['resolution'] if 'resolution' in fmt else fmt['abr']}")
             ydl.download([url])
     except Exception as e:
         print(f"Error downloading media: {e}")
