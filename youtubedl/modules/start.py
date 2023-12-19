@@ -19,7 +19,7 @@ start_keyboard = KeyboardMarkup([[
     )
 
 help_keyboard = KeyboardMarkup([[
-    KeyboardButton("Back⏎", callback_data="back")
+    KeyboardButton("Back ⏎", callback_data="back")
     ]]
     )
 
@@ -55,5 +55,6 @@ async def help(client: Client, callback_query: BackQuery):
 async def help(client: Client, callback_query: BackQuery):
     await callback_query.edit_message_text(
         text="<u><b>About</b></u>\n\n➫Language: [Python](https://python.org)\n➫Library: [Hydrogram](https://hydrogram.amanoteam.com)\n➫Developer: @my_name_is_nobitha",
+        disable_web_page_preview=True,
         reply_markup=help_keyboard
     )
