@@ -8,7 +8,6 @@ from hydrogram.types import (
 )
 from youtube_search import YoutubeSearch
 from yt_dlp import YoutubeDL
-from youtubedl import ytdl
 
 DOWNLOAD_DIR = "downloads/"
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
@@ -16,25 +15,18 @@ os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 AUDIO_QUALITIES = ["low", "medium", "high"]
 VIDEO_QUALITIES = ["144p", "240p", "360p", "480p", "720p", "1080p"]
 
-ydl_opts = {
-    "format": "best",
-    "verbose": True,
-    "geo-bypass": True,
-    "nocheckcertificate": True,
-    "outtmpl": DOWNLOAD_DIR + "%(title)s.%(ext)s",
-}
-
-ydl = YoutubeDL(ydl_opts)
-
 def download_media(url, quality, is_audio=True):
-    if is_audio:
-        ydl["format"] = f"bestaudio[abr={quality}]"
-    else:
-        ydl["format"] = f"bestvideo[height={quality}]"
+    ydl_opts = {
+        "format": "bestaudio[abr={0}]".format(quality) if is_audio else "bestvideo[height={0}]".format(quality),
+        "verbose": True,
+        "geo-bypass": True,
+        "nocheckcertificate": True,
+        "outtmpl": DOWNLOAD_DIR + "%(title)s.%(ext)s",
+    }
 
     try:
-        with YoutubeDL(ydl) as ydll:
-            ydll.download([url])
+        with YoutubeDL(ydl_opts) as ydl:
+            ydl.download([url])
     except Exception as e:
         print(f"Error downloading media: {e}")
         raise
