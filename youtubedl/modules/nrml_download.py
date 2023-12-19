@@ -8,7 +8,6 @@ from hydrogram.types import (
 )
 from youtube_search import YoutubeSearch
 from yt_dlp import YoutubeDL
-from youtubedl import ytdl 
 
 DOWNLOAD_DIR = "downloads/"
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
@@ -27,18 +26,17 @@ ydl_opts = {
 ydl = YoutubeDL(ydl_opts)
 
 def download_media(url, quality, is_audio=True):
-    options = {
-        "format": None,  # Let yt_dlp choose the best format
-        "outtmpl": DOWNLOAD_DIR + "%(title)s.%(ext)s",
-    }
-
     if is_audio:
-        options["format"] = f"bestaudio[abr={quality}]"
+        ydl["format"] = f"bestaudio[abr={quality}]"
     else:
-        options["format"] = f"bestvideo[height={quality}]"
+        ydl["format"] = f"bestvideo[height={quality}]"
 
-    with YoutubeDL(options) as ydl:
-        ydl.download([url])
+    try:
+        with YoutubeDL(ydl) as ydll:
+            ydll.download([url])
+    except Exception as e:
+        print(f"Error downloading media: {e}")
+        raise
 
 def get_thumbnail(url):
     with YoutubeDL({"outtmpl": "%(title)s.%(ext)s"}) as ydl:
@@ -96,5 +94,5 @@ async def handle_callback_query(client: Client, query: CallbackQuery):
             caption="This is your requested video."
         )
     except Exception as e:
-        print(f"Error downloading media: {e}")
+        print(f"Error handling callback query: {e}")
         await query.message.reply_text("Error downloading media. Please try again.")
