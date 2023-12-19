@@ -74,13 +74,11 @@ def download_video_callback(client, callback_query):
     _, video_id, download_type = callback_query.data.split(":")
     chat_id = callback_query.message.chat.id
     msg = callback_query.message.edit_text("Wait! Your Video is being found...")
-    asyncio.sleep(0.2)
+    asyncio.sleep(0.5)
     msg.edit_text("Found your Video....")
-    asyncio.sleep(0.2)
+    asyncio.sleep(0.5)
     msg.edit_text("URL checking....")
-    asyncio.sleep(0.2)
     if download_type == "video":
-        ytdl.send_message(chat_id, text="Wait! Your video is being found...")
         download_video(video_id, "best")
         share_keyboard = Markup([[
                 Button("Youtube", url=f"https://www.youtube.com/watch?v={video_id}")
@@ -96,11 +94,10 @@ def download_audio_callback(client, callback_query):
     video_id = callback_query.matches[0].group(1)
     chat_id = callback_query.message.chat.id
     msg = callback_query.message.edit_text("Wait! Your audio is being found...")
-    asyncio.sleep(0.2)
+    asyncio.sleep(0.5)
     msg.edit_text("Found your audio....")
-    asyncio.sleep(0.2)
+    asyncio.sleep(0.5)
     msg.edit_text("URL checking....")
-    asyncio.sleep(0.2)
     download_audio(video_id)
     share_keyboard = Markup([[
         Button("Youtube", url=f"https://www.youtube.com/watch?v={video_id}")
