@@ -51,7 +51,7 @@ def download_audio(video_id):
     with YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
 
-@ytdl.on_message(filters.incoming & filters.text)
+@ytdl.on_message(filters.text)
 def handle_text_message(client, message):
     query = message.text.strip()
     video_id = extract_video_id(query)
@@ -113,4 +113,4 @@ async def download_audio_callback(client, callback_query):
             await ytdl.send_audio(chat_id, audio=audio_file, caption=f"Here is your audio: {video_info['title']}\n\nDeveloped By: @my_name_is_nobitha", reply_markup=share_keyboard)
         os.remove(file_path)
     else:
-        await ytdl.send_message(chat_id, text="Error: Audio file not found.")
+        await ytdl.send_message(chat_id, text="Error: Audio file not found.")        
