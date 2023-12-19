@@ -5,7 +5,7 @@ from hydrogram.types import (
     InlineKeyboardMarkup as Markup,
     Message as Msg
 )
-from youtubesearch import YoutubeSearch
+from youtubesearchpython import YoutubeSearch
 from yt_dlp import YoutubeDL
 from PIL import Image
 from youtubedl import ytdl
