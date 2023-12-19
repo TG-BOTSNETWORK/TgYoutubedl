@@ -40,7 +40,7 @@ async def help(client: Client, msg: Msg):
 @ytdl.on_callback_query(filters.regex("back"))
 async def back_callback(client: Client, callback_query: BackQuery):
     await callback_query.edit_message_text(
-        text=f"**👋Hello {callback_query.msg.from_user.mention()}**\n\nWelcome, I am a YouTube downloader bot. I can download YouTube videos or audios by searching and providing links and playlist links.👀\n\n**Developed By**: @TgBotsNetwork",
+        text=f"**👋Hello {callback_query.message.from_user.mention()}**\n\nWelcome, I am a YouTube downloader bot. I can download YouTube videos or audios by searching and providing links and playlist links.👀\n\n**Developed By**: @TgBotsNetwork",
         reply_markup=start_keyboard
     )
 
