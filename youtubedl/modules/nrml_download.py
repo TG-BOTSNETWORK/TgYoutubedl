@@ -9,6 +9,7 @@ from yt_dlp import YoutubeDL
 from youtubedl import ytdl
 import yt_dlp
 import re
+import asyncio
 
 DOWNLOAD_DIR = "downloads/"
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
@@ -31,16 +32,21 @@ def download_video(video_id, quality="best"):
     url = f"https://www.youtube.com/watch?v={video_id}"
     ydl_opts = {
         "format": quality,
-        "outtmpl": f"{DOWNLOAD_DIR}/{video_id}.%(ext)s",  
+        "outtmpl": f"{DOWNLOAD_DIR}/{video_id}.%(ext)s",
     }
     with YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
-        
+
 def download_audio(video_id):
     url = f"https://www.youtube.com/watch?v={video_id}"
     ydl_opts = {
         "format": "bestaudio",
         "outtmpl": f"{DOWNLOAD_DIR}/{video_id}.mp3",
+        "postprocessors": [{
+            'key': 'FFmpegExtractAudio',
+            'preferredcodec': 'mp3',
+            'preferredquality': '192',
+        }],
     }
     with YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
@@ -49,7 +55,8 @@ def download_audio(video_id):
 def handle_text_message(client, message):
     query = message.text.strip()
     video_id = extract_video_id(query)
-
+    hmm = message.reply_text("Processing your query")
+    hmm.edit_text("Sending Audio Video Modes....")
     if video_id:
         video_info = get_video_info(video_id)
         thumbnail_url = video_info["thumbnails"][-1]["url"]
@@ -66,19 +73,22 @@ def handle_text_message(client, message):
 def download_video_callback(client, callback_query):
     _, video_id, download_type = callback_query.data.split(":")
     chat_id = callback_query.message.chat.id
-
+    msg = callback_query.message.edit_text("Wait! Your Video is being found...")
+    asyncio.sleep(0.2)
+    msg.edit_text("Found your Video....")
+    asyncio.sleep(0.2)
+    msg.edit_text("URL checking....")
+    asyncio.sleep(0.2)
     if download_type == "video":
         ytdl.send_message(chat_id, text="Wait! Your video is being found...")
-
         download_video(video_id, "best")
         share_keyboard = Markup([[
                 Button("Youtube", url=f"https://www.youtube.com/watch?v={video_id}")
                 ]]
                 )
-
-        file_path = f"{DOWNLOAD_DIR}/{video_id}.mp4"
-        ytdl.send_message(chat_id, text="Uploading your video...")
-        ytdl.send_video(chat_id, video=file_path, caption="Here is your video.\n\nDeveleoped By: @my_name_is_nobitha", reply_markup=share_keyboard)
+        file_path = f"{DOWNLOAD_DIR}/{video_info['title']}.mp4"
+        msg.edit_text(chat_id, text="Uploading your video...")
+        ytdl.send_video(chat_id, video=file_path, caption=f"Here is your video: {video_info['title']}\n\nDeveloped By: @my_name_is_nobitha", reply_markup=share_keyboard)
         os.remove(file_path)
 
 @ytdl.on_callback_query(filters.regex(r"download_audio:(\S+)"))
@@ -86,22 +96,20 @@ def download_audio_callback(client, callback_query):
     video_id = callback_query.matches[0].group(1)
     chat_id = callback_query.message.chat.id
     msg = callback_query.message.edit_text("Wait! Your audio is being found...")
-
+    asyncio.sleep(0.2)
     msg.edit_text("Found your audio....")
+    asyncio.sleep(0.2)
     msg.edit_text("URL checking....")
-
+    asyncio.sleep(0.2)
     download_audio(video_id)
-
     share_keyboard = Markup([[
         Button("Youtube", url=f"https://www.youtube.com/watch?v={video_id}")
     ]])
-
-    file_path = f"{callback_query.message.from_user.first_name}.mp3"
+    file_path = f"{DOWNLOAD_DIR}/{video_info['title']}.mp3"
     msg.edit_text("Uploading Your Audio....")
-
     if os.path.exists(file_path):
         with open(file_path, "rb") as audio_file:
-            ytdl.send_audio(chat_id, audio=audio_file, caption="Here is your audio.\n\nDeveloped By: @my_name_is_nobitha", reply_markup=share_keyboard)
+            ytdl.send_audio(chat_id, audio=audio_file, caption=f"Here is your audio: {video_info['title']}\n\nDeveloped By: @my_name_is_nobitha", reply_markup=share_keyboard)
         os.remove(file_path)
     else:
         ytdl.send_message(chat_id, text="Error: Audio file not found.")
