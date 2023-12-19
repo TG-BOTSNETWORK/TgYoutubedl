@@ -51,7 +51,7 @@ def download_audio(video_id):
     with YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
 
-@ytdl.on_message(filters.text & filters.command(["start", "help", "stats", "broadcast", "settings"]))
+@ytdl.on_message(filters.text & ~filters.command(["start", "help", "stats", "broadcast", "settings"]))
 def handle_text_message(client, message):
     query = message.text.strip()
     video_id = extract_video_id(query)
