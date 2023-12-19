@@ -33,7 +33,7 @@ def download_video(video_id, quality="best"):
     url = f"https://www.youtube.com/watch?v={video_id}"
     ydl_opts = {
         "format": quality,
-        "outtmpl": f"{video_id}.%(ext)s",
+        "outtmpl": f"{DOWNLOAD_DIR}/{video_id}.%(ext)s",  # Save in DOWNLOAD_DIR
     }
     with YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
@@ -49,14 +49,14 @@ def handle_text_message(client, message):
 
         reply_markup = Markup([
             [Button("Video", callback_data=f"download_video:{video_id}:video"),
-             Button("Audio", callback_data=f"download_video:{video_id}:audio")]
+             Button("Audio", callback_data=f"download_audio:{video_id}:audio")]
         ])
 
         ytdl.send_photo(chat_id=message.chat.id, photo=thumbnail_url,
                           caption=f"{video_info['title']}\n\nChoose download type:", reply_markup=reply_markup)
 
 @ytdl.on_callback_query(filters.regex(r"download_video:(\S+):(\S+)"))
-def download_callback(client, callback_query):
+def download_video_callback(client, callback_query):
     _, video_id, download_type = callback_query.data.split(":")
     chat_id = callback_query.message.chat.id
 
@@ -65,17 +65,25 @@ def download_callback(client, callback_query):
 
         download_video(video_id, "best")
 
-        file_path = f"{video_id}.mp4"
+        file_path = f"{DOWNLOAD_DIR}/{video_id}.mp4"
         ytdl.send_message(chat_id, text="Uploading your video...")
         ytdl.send_video(chat_id, video=file_path, caption="Here is your video.")
         os.remove(file_path)
-    elif download_type == "audio":
+
+@ytdl.on_callback_query(filters.regex(r"download_audio:(\S+):(\S+)"))
+def download_audio_callback(client, callback_query):
+    _, video_id, download_type = callback_query.data.split(":")
+    chat_id = callback_query.message.chat.id
+
+    if download_type == "audio":
         ytdl.send_message(chat_id, text="Wait! Your audio is being found...")
 
         download_video(video_id, "bestaudio")
 
-        file_path = f"{video_id}.mp3"
-        with open(file_path, "rb") as audio_file:
-            ytdl.send_audio(chat_id, audio=audio_file, caption="Here is your audio.")
-        os.remove(file_path)
-
+        file_path = f"{DOWNLOAD_DIR}/{video_id}.mp3"
+        if os.path.exists(file_path):
+            with open(file_path, "rb") as audio_file:
+                ytdl.send_audio(chat_id, audio=audio_file, caption="Here is your audio.")
+            os.remove(file_path)
+        else:
+            ytdl.send_message(chat_id, text="Error: Audio file not found.")
