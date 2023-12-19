@@ -10,6 +10,7 @@ from youtube_search import YoutubeSearch
 from yt_dlp import YoutubeDL
 from youtubedl import ytdl
 import yt_dlp
+import re
 
 DOWNLOAD_DIR = "downloads/"
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
@@ -17,7 +18,24 @@ os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 AUDIO_QUALITIES = ["low", "medium", "high"]
 VIDEO_QUALITIES = ["144p", "240p", "360p", "480p", "720p", "1080p"]
 
+def extract_video_id(url):
+    # Extract video ID from YouTube URL using regex
+    patterns = [
+        r"(?:(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=))|(?:youtu\.be\/))([^\"&?\/\s]{11})",
+        r"(?<=youtu\.be\/|v=|\/videos\/|embed\/|youtu\.be\/|user\/[a-zA-Z0-9_\-]+\/playlist\?list=|users\/[a-zA-Z0-9_\-]+\/playlist\?list=|artists\/[a-zA-Z0-9_\-]+\/playlist\?list=|embed\?listType=playlist&list=|watch\?v=|&v=|watch\?feature=player_embedded&v=|%2Fvideos%2F|embed%\2F|e\%2F|(?:[\/\?\&]vi?\%3D))([\w-]{10,12})",
+    ]
+    for pattern in patterns:
+        match = re.search(pattern, url)
+        if match:
+            return match.group(1)
+
 def download_media(url, quality, is_audio=True):
+    video_id = extract_video_id(url)
+
+    if not video_id:
+        print("Invalid YouTube URL.")
+        return
+
     ydl_opts = {
         "format": "bestaudio[abr={0}]".format(quality) if is_audio else "bestvideo[height={0}]".format(quality),
         "verbose": True,
@@ -45,8 +63,6 @@ def download_media(url, quality, is_audio=True):
                 ydl.download([url])
     except Exception as e:
         print(f"Error downloading media: {e}")
-        raise
-
 
 
 def get_thumbnail(url):
