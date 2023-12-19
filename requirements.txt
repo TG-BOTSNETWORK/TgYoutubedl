@@ -6,3 +6,4 @@ git+https://github.com/yt-dlp/yt-dlp@master
 python-dotenv
 pillow==9.5.0
 youtube-search
+asyncio
