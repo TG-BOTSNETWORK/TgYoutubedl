@@ -75,5 +75,7 @@ def download_callback(client, callback_query):
         download_video(video_id, "bestaudio")
 
         file_path = f"{video_id}.mp3"
-        ytdl.send_audio(chat_id, f"{video_id}.mp3", caption="Here is your audio.")
+        with open(file_path, "rb") as audio_file:
+            ytdl.send_audio(chat_id, audio=audio_file, caption="Here is your audio.")
         os.remove(file_path)
+
