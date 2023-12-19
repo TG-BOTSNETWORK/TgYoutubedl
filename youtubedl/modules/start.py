@@ -20,5 +20,3 @@ async def start_handler(client: Client, msg: Msg):
         text=f"**👋Hello {msg.from_user.mention()}**\nWelcome, I am a YouTube downloader bot. I can download YouTube videos or audios by searching and providing links and playlist links.👀\n\n**Developed By**: @TgBotsNetwork",
         reply_markup=start_keyboard
     )
-else:
-     await msg.reply_text("Start me in Dm")
