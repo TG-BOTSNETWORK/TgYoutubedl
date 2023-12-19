@@ -59,6 +59,6 @@ def download_callback(client, callback_query):
     download_video(video_id, "best" if download_type == "video" else "bestaudio")
 
     file_path = f"{video_id}.{'mp4' if download_type == 'video' else 'webm'}"
-    ytdl.send_video(chat_id=callback_query.message.chat.id, document=file_path,
+    ytdl.send_video(chat_id=callback_query.message.chat.id, video=file_path,
                          caption="Here is your video.")
     os.remove(file_path)
