@@ -3,7 +3,8 @@ from hydrogram import Client, filters
 from hydrogram.types import (
     InlineKeyboardButton as Button,
     InlineKeyboardMarkup as Markup,
-    Message as Msg
+    Message as Msg,
+    CallbackQuery
 )
 from youtube_search  import YoutubeSearch
 from yt_dlp import YoutubeDL
