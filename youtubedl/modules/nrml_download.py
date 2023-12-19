@@ -18,6 +18,24 @@ os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 AUDIO_QUALITIES = ["low", "medium", "high"]
 VIDEO_QUALITIES = ["144p", "240p", "360p", "480p", "720p", "1080p"]
 
+import os
+from hydrogram import Client, filters
+from hydrogram.types import (
+    InlineKeyboardButton as Button,
+    InlineKeyboardMarkup as Markup,
+    Message as Msg,
+    CallbackQuery
+)
+from youtube_search import YoutubeSearch
+from yt_dlp import YoutubeDL
+import re
+
+DOWNLOAD_DIR = "downloads/"
+os.makedirs(DOWNLOAD_DIR, exist_ok=True)
+
+AUDIO_QUALITIES = ["low", "medium", "high"]
+VIDEO_QUALITIES = ["144p", "240p", "360p", "480p", "720p", "1080p"]
+
 def extract_video_id(url):
     # Extract video ID from YouTube URL using regex
     patterns = [
@@ -37,12 +55,16 @@ def download_media(url, quality, is_audio=True):
         return
 
     ydl_opts = {
-        "format": "bestaudio[abr={0}]".format(quality) if is_audio else "bestvideo[height={0}]".format(quality),
         "verbose": True,
         "geo-bypass": True,
         "nocheckcertificate": True,
         "outtmpl": DOWNLOAD_DIR + "%(title)s.%(ext)s",
     }
+
+    if is_audio:
+        ydl_opts["format"] = "bestaudio[abr={0}]".format(quality)
+    else:
+        ydl_opts["format"] = "bestvideo[height={0}]".format(quality)
 
     try:
         with YoutubeDL(ydl_opts) as ydl:
@@ -63,7 +85,6 @@ def download_media(url, quality, is_audio=True):
                 ydl.download([url])
     except Exception as e:
         print(f"Error downloading media: {e}")
-
 
 def get_thumbnail(url):
     with YoutubeDL({"outtmpl": "%(title)s.%(ext)s"}) as ydl:
