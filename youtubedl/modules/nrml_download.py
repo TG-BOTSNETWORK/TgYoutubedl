@@ -9,6 +9,7 @@ from hydrogram.types import (
 from youtube_search import YoutubeSearch
 from yt_dlp import YoutubeDL
 from youtubedl import ytdl
+import yt_dlp
 
 DOWNLOAD_DIR = "downloads/"
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
@@ -36,14 +37,16 @@ def download_media(url, quality, is_audio=True):
             for format in info.get('formats', []):
                 print(format['format_id'], format['ext'], format.get('quality'))
         raise
-    except Exception as e:
-        print(f"Error downloading media: {e}")
+    except yt_dlp.utils.DownloadError as e:
         if "Requested format is not available" in str(e):
+            print("Error: Requested format is not available.")
             print("Available formats:")
             with YoutubeDL() as ydl:
                 info = ydl.extract_info(url, download=False)
                 for format in info.get('formats', []):
                     print(format['format_id'], format['ext'], format.get('quality'))
+        else:
+            print(f"Error downloading media: {e}")
         raise
 
 def get_thumbnail(url):
