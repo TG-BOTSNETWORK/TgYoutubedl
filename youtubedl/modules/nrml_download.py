@@ -88,13 +88,14 @@ def download_audio_callback(client, callback_query):
     video_id = callback_query.matches[0].group(1)
     chat_id = callback_query.message.chat.id
     msg = callback_query.edit_message_text("Wait! Your audio is being founding...")
-
+    msg.edit_message_text("Founded your audio....")
+    msg.edit_message_text("Url checking....")
     download_audio(video_id)
     share_keyboard = Markup([[
             Button("Youtube", url=f"https://www.youtube.com/watch?v={video_id}")
             ]]
             )
-    file_path = f"{callback_query.messgage.from_user.first_name}.mp3"
+    file_path = f"{callback_query.message.from_user.first_name}.mp3"
     msg.edit_message_text("Uploading Your Audio....")
     if os.path.exists(file_path):
         with open(file_path, "rb") as audio_file:
