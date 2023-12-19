@@ -19,7 +19,7 @@ AUDIO_QUALITIES = ["low", "medium", "high"]
 VIDEO_QUALITIES = ["144p", "240p", "360p", "480p", "720p", "1080p"]
 
 def extract_video_id(url):
-    match = re.search(r"(?<=v=|\/videos\/|embed\/|youtu.be\/|\/v\/|\/e\/|watch\?v=|&v=|%2Fvideos%2F|%2Fwatch%3Fv%3D|%2F|\?v=)([^#\\&\?]*)(?:[\w-]+)?", url)
+    match = re.search(r"(?:v=|\/videos\/|embed\/|youtu.be\/|\/v\/|\/e\/|watch\?v=|&v=|%2Fvideos%2F|%2Fwatch%3Fv%3D|%2F|\?v=)([^#\\&\?]*)(?:[\w-]+)?", url)
     if match:
         return match.group(1)
     else:
