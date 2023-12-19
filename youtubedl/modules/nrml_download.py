@@ -28,26 +28,20 @@ def download_media(url, quality, is_audio=True):
 
     try:
         with YoutubeDL(ydl_opts) as ydl:
-            ydl.download([url])
-    except yt_dlp.utils.ExtractorError as e:
-        print(f"Error extracting information: {e}")
-        print("Available formats:")
-        with YoutubeDL() as ydl:
             info = ydl.extract_info(url, download=False)
-            for format in info.get('formats', []):
-                print(format['format_id'], format['ext'], format.get('quality'))
+            formats = info.get('formats', [])
+            available_formats = [fmt for fmt in formats if quality in fmt.get('format_note', '').lower()]
+            if not available_formats:
+                print("Error: Requested format is not available. Choosing a fallback option.")
+                available_formats = formats
+            chosen_format = max(available_formats, key=lambda fmt: fmt.get('quality', 0))       
+            ydl_opts["format"] = chosen_format['format_id']
+            with YoutubeDL(ydl_opts) as ydl:
+                ydl.download([url])
+    except Exception as e:
+        print(f"Error downloading media: {e}")
         raise
-    except yt_dlp.utils.DownloadError as e:
-        if "Requested format is not available" in str(e):
-            print("Error: Requested format is not available.")
-            print("Available formats:")
-            with YoutubeDL() as ydl:
-                info = ydl.extract_info(url, download=False)
-                for format in info.get('formats', []):
-                    print(format['format_id'], format['ext'], format.get('quality'))
-        else:
-            print(f"Error downloading media: {e}")
-        raise
+
 
 def get_thumbnail(url):
     with YoutubeDL({"outtmpl": "%(title)s.%(ext)s"}) as ydl:
