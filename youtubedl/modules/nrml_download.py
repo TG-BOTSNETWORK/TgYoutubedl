@@ -35,7 +35,7 @@ def download_video(video_id, quality="best"):
         ydl.download([url])
 
 
-@ytdl.on_message(filters.private & filters.text)
+@ytdl.on_message(filters.incoming & filters.text)
 def handle_text_message(client, message):
     query = message.text.strip()
     results = YoutubeSearch(query, max_results=1).to_dict()
