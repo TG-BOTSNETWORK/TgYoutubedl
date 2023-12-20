@@ -43,15 +43,10 @@ def download_audio(video_id):
     ydl_opts = {
         "format": "bestaudio",
         "outtmpl": f"{DOWNLOAD_DIR}/{video_id}.mp3",
-        "postprocessors": [{
-            'key': 'FFmpegExtractAudio',
-            'preferredcodec': 'mp3',
-            'preferredquality': '192',
-        }],
     }
     with YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
-
+        
 @ytdl.on_message(filters.text & ~filters.command(["start", "help", "stats", "broadcast", "settings"]))
 def handle_text_message(client, message):
     query = message.text.strip()
@@ -98,22 +93,28 @@ def download_audio_callback(client, callback_query):
     video_id = callback_query.matches[0].group(1)
     chat_id = callback_query.message.chat.id
     msg = callback_query.message.edit_text("Wait! Your audio is being found...")
-    time.sleep(0.1)
-    msg.edit_text("Found your audio....")
-    time.sleep(0.1)
-    msg.edit_text("URL checking....")
-    video_info = get_video_info(video_id)   
-    share_keyboard = Markup([[
-        Button("Youtube", url=f"https://www.youtube.com/watch?v={video_id}")
-    ]])
-    file_path = f"{DOWNLOAD_DIR}/{video_info['title']}.mp3"
-    time.sleep(0.1)
-    msg.edit_text("Uploading Your Audio....")
-    time.sleep(2)
 
-    if os.path.exists(file_path):
-        with open(file_path, "rb") as audio_file:
-            ytdl.send_audio(chat_id, audio=audio_file, caption=f"Here is your audio: {video_info['title']}\n\nDeveloped By: @my_name_is_nobitha", reply_markup=share_keyboard)
-        os.remove(file_path)
-    else:
-        msg.edit_text("Error: Audio file not found.")
+    try:
+        # Retrieve video information
+        video_info = get_video_info(video_id)
+
+        # Download audio
+        download_audio(video_id)
+
+        # Wait for the download to complete
+        time.sleep(2)
+
+        # Check if the audio file exists
+        file_path = f"{DOWNLOAD_DIR}/{video_id}.mp3"
+        if os.path.exists(file_path):
+            with open(file_path, "rb") as audio_file:
+                share_keyboard = Markup([[
+                    Button("Youtube", url=f"https://www.youtube.com/watch?v={video_id}")
+                ]])
+                msg.edit_text("Uploading Your Audio....")
+                ytdl.send_audio(chat_id, audio=audio_file, caption=f"Here is your audio: {video_info['title']}\n\nDeveloped By: @my_name_is_nobitha", reply_markup=share_keyboard)
+                os.remove(file_path)
+        else:
+            msg.edit_text("Error: Audio file not found.")
+    except Exception as e:
+        msg.edit_text(f"Error: {str(e)}")
