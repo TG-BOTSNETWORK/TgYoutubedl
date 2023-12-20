@@ -45,6 +45,20 @@ async def start(client: Client, msg: Msg):
         reply_markup=start_keyboard
     )
 
+@ytdl.on_callback_query(filters.regex("nrml_dl"))
+async def nrml_dl_callback(client: Client, callback_query: BackQuery):
+    await callback_data.edit_message_text(
+        text="Choose a On Off Buttons to change mode:",
+        reply_markup=start_keyboard
+    )
+
+@ytdl.on_callback_query(filters.regex("plylist_dl"))
+async def plylist_dl_callback(client: Client, callback_query: BackQuery):
+    await callback_data.edit_message_text(
+        text="Choose a On Off Buttons to change mode:",
+        reply_markup=start_keyboard
+    )
+    
 @ytdl.on_callback_query(filters.regex(r"(?i)on|off"))
 async def on_off_callback(client: Client, callback_query: BackQuery):
     user_id = callback_query.from_user.id
