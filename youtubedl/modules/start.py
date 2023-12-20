@@ -1,3 +1,4 @@
+import pymongo
 from hydrogram import Client, filters
 from hydrogram.types import (
     InlineKeyboardButton as KeyboardButton,
@@ -6,12 +7,11 @@ from hydrogram.types import (
     CallbackQuery as BackQuery
 )
 from youtubedl import ytdl
-from youtubedl.database.mode_db import(
-    get_normal_download_status,
-    set_normal_download_status,
-    get_playlist_download_status,
-    set_playlist_download_status
-)
+from config.config import DB_URI
+
+mongo_client = pymongo.MongoClient(DB_URI)
+db = mongo_client["playlistmode"]
+user_mode = db["user_settings"]
 
 start_keyboard = KeyboardMarkup([[
     KeyboardButton("📥 Normal Download", callback_data="nrml_dl"),
@@ -50,14 +50,14 @@ async def start(client: Client, msg: Msg):
 @ytdl.on_callback_query(filters.regex("nrml_dl"))
 async def nrml_dl_callback(client: Client, callback_query: BackQuery):
     await callback_query.edit_message_text(
-        text="Choose a On Off Buttons to change mode:",
+        text="Choose an On/Off button to change mode:",
         reply_markup=on_off_buttons
     )
 
 @ytdl.on_callback_query(filters.regex("plylist_dl"))
 async def plylist_dl_callback(client: Client, callback_query: BackQuery):
     await callback_query.edit_message_text(
-        text="Choose a On Off Buttons to change mode:",
+        text="Choose an On/Off button to change mode:",
         reply_markup=on_off_buttons
     )
     
@@ -73,12 +73,12 @@ async def on_off_callback(client: Client, callback_query: BackQuery):
         set_normal_download_status(user_id, command)
     elif callback_query.data.endswith("plylist_dl"):
         set_playlist_download_status(user_id, command)  
-    await callback_query.answer("Changed Current Settings", show_alert=True)
+    await callback_query.answer(f"Changed Current Settings: {status_text}", show_alert=True)
 
 @ytdl.on_message(filters.command("help") & filters.private)
 async def help(client: Client, msg: Msg):
     await msg.reply_text(
-        text="<u><b>Help Section</b></u>\n\n- First you choose mode in start buttons choose a playlist mode or normal mode and then send links of youtube and wait fora downlaod and save that in files.\n\n-<u><b>Available Commands</b></u>\n- /start Start the bot check alive or not.\n- /help To know about bot deeply.",
+        text="<u><b>Help Section</b></u>\n\n- First, choose a mode in the start buttons: choose playlist mode or normal mode, and then send links from YouTube. Wait for a download, and the files will be saved.\n\n-<u><b>Available Commands</b></u>\n- /start: Start the bot and check if it's alive or not.\n- /help: Get information about the bot.",
         reply_markup=help_keyboard
     )
 
@@ -96,7 +96,7 @@ async def back_callback(client: Client, callback_query: BackQuery):
 @ytdl.on_callback_query(filters.regex("help"))
 async def help(client: Client, callback_query: BackQuery):
     await callback_query.edit_message_text(
-        text="<u><b>Help Section</b></u>\n\n- First you choose mode in start buttons choose a playlist mode or normal mode and then send links of youtube and wait fora downlaod and save that in files.\n\n-<u><b>Available Commands</b></u>\n- /start Start the bot check alive or not.\n- /help To know about bot deeply.",
+        text="<u><b>Help Section</b></u>\n\n- First, choose a mode in the start buttons: choose playlist mode or normal mode, and then send links from YouTube. Wait for a download, and the files will be saved.\n\n-<u><b>Available Commands</b></u>\n- /start: Start the bot and check if it's alive or not.\n- /help: Get information about the bot.",
         reply_markup=help_keyboard
     )
 
