@@ -30,8 +30,8 @@ help_keyboard = KeyboardMarkup([[
     )
 
 on_off_buttons = KeyboardMarkup([
-    [KeyboardButton("On", callback_data="on"), 
-     KeyboardButton("Off", callback_data="off")]
+    [KeyboardButton("✅ On", callback_data="on"), 
+     KeyboardButton("Off ❌", callback_data="off")]
 ])
 
 @ytdl.on_message(filters.command("start") & filters.private)
@@ -47,16 +47,16 @@ async def start(client: Client, msg: Msg):
 
 @ytdl.on_callback_query(filters.regex("nrml_dl"))
 async def nrml_dl_callback(client: Client, callback_query: BackQuery):
-    await callback_data.edit_message_text(
+    await callback_query.edit_message_text(
         text="Choose a On Off Buttons to change mode:",
-        reply_markup=start_keyboard
+        reply_markup=on_off_buttons
     )
 
 @ytdl.on_callback_query(filters.regex("plylist_dl"))
 async def plylist_dl_callback(client: Client, callback_query: BackQuery):
-    await callback_data.edit_message_text(
+    await callback_query.edit_message_text(
         text="Choose a On Off Buttons to change mode:",
-        reply_markup=start_keyboard
+        reply_markup=on_off_buttons
     )
     
 @ytdl.on_callback_query(filters.regex(r"(?i)on|off"))
