@@ -11,7 +11,7 @@ import yt_dlp
 import re
 import asyncio
 import time
-
+import requests
 
 def extract_video_id(url):
     match = re.search(r"(?:v=|\/videos\/|embed\/|youtu.be\/|\/v\/|\/e\/|watch\?v=|&v=|%2Fvideos%2F|%2Fwatch%3Fv%3D|%2F|\?v=)([^#\\&\?]*)(?:[\w-]+)?", url)
