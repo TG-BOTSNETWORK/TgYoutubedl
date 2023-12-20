@@ -29,10 +29,12 @@ help_keyboard = KeyboardMarkup([[
     ]]
     )
 
-on_off_buttons = KeyboardMarkup([
-    [KeyboardButton("✅ On", callback_data="on"), 
-     KeyboardButton("Off ❌", callback_data="off")]
-])
+on_off_buttons = KeyboardMarkup([[
+     KeyboardButton("✅ On", callback_data="on"), 
+     KeyboardButton("Off ❌", callback_data="off"),
+     ],[
+     KeyboardButton("Back ⏎", callback_data="back")
+     ]])
 
 @ytdl.on_message(filters.command("start") & filters.private)
 async def start(client: Client, msg: Msg):
@@ -62,15 +64,15 @@ async def plylist_dl_callback(client: Client, callback_query: BackQuery):
 @ytdl.on_callback_query(filters.regex(r"(?i)on|off"))
 async def on_off_callback(client: Client, callback_query: BackQuery):
     user_id = callback_query.from_user.id
-    command = callback_query.matches[0].lower()
-    if command == "on":
+    command = callback_query.data  
+    if "on" in command:
         status_text = "✅ On"
-    elif command == "off":
-        status_text = "❌ Off"
+    elif "off" in command:
+        status_text = "❌ Off"    
     if callback_query.data.endswith("nrml_dl"):
         set_normal_download_status(user_id, command)
     elif callback_query.data.endswith("plylist_dl"):
-        set_playlist_download_status(user_id, command)
+        set_playlist_download_status(user_id, command)  
     await callback_query.answer("Changed Current Settings", show_alert=True)
 
 @ytdl.on_message(filters.command("help") & filters.private)
