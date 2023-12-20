@@ -6,12 +6,21 @@ from hydrogram.types import (
     Message as Msg,
     CallbackQuery as BackQuery
 )
+User
+from hydrogram import Client, filters
+from hydrogram.types import (
+    InlineKeyboardButton as KeyboardButton,
+    InlineKeyboardMarkup as KeyboardMarkup,
+    Message as Msg,
+    CallbackQuery as BackQuery
+)
 from youtubedl import ytdl
-from config.config import DB_URI
-
-mongo_client = pymongo.MongoClient(DB_URI)
-db = mongo_client["playlistmode"]
-user_mode = db["user_settings"]
+from youtubedl.database.mode_db import(
+    get_normal_download_status,
+    set_normal_download_status,
+    get_playlist_download_status,
+    set_playlist_download_status
+)
 
 start_keyboard = KeyboardMarkup([[
     KeyboardButton("📥 Normal Download", callback_data="nrml_dl"),
