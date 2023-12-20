@@ -40,9 +40,10 @@ def download_video(video_id, quality="best"):
 
 def download_audio(video_id):
     url = f"https://www.youtube.com/watch?v={video_id}"
+    video_info = get_video_info(video_id)
     ydl_opts = {
         "format": "bestaudio",
-        "outtmpl": f"{DOWNLOAD_DIR}/{video_id}.mp3",
+        "outtmpl": f"{video_info['title']}.mp3",
     }
     with YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
@@ -92,20 +93,12 @@ def download_video_callback(client, callback_query):
 def download_audio_callback(client, callback_query):
     video_id = callback_query.matches[0].group(1)
     chat_id = callback_query.message.chat.id
-    msg = callback_query.message.edit_text("Wait! Your audio is being found...")
-
+    msg = callback_query.message.edit_text("Wait! Searching for a video...")
     try:
-        # Retrieve video information
         video_info = get_video_info(video_id)
-
-        # Download audio
         download_audio(video_id)
-
-        # Wait for the download to complete
         time.sleep(2)
-
-        # Check if the audio file exists
-        file_path = f"{DOWNLOAD_DIR}/{video_id}.mp3"
+        file_path = f"{video_info['title']}.mp3"
         if os.path.exists(file_path):
             with open(file_path, "rb") as audio_file:
                 share_keyboard = Markup([[
