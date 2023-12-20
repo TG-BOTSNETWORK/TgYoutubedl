@@ -7,3 +7,4 @@ python-dotenv
 pillow==9.5.0
 youtube-search
 asyncio
+requests
