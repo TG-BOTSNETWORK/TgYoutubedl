@@ -85,7 +85,7 @@ def download_video_callback(client, callback_query):
         with open(thumb_path, "wb") as thumb_file:
             thumb_file.write(requests.get(video_info['thumbnails'][-1]['url']).content)
         time.sleep(0.1)
-        msg.edit_text(chat_id, text="Uploading your video...")
+        msg.edit_text("Uploading your video...")
         time.sleep(2)
         ytdl.send_video(
             chat_id,
@@ -104,7 +104,7 @@ def download_audio_callback(client, callback_query):
     chat_id = callback_query.message.chat.id
     msg = callback_query.message.edit_text("Wait! Searching for a video...")
     time.sleep(0.1)
-    msg.edit_text("Founded your Video....")
+    msg.edit_text("Founded your Audio....")
     try:
         video_info = get_video_info(video_id)
         download_audio(video_id)
