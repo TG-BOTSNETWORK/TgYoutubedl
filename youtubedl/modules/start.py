@@ -6,14 +6,6 @@ from hydrogram.types import (
     Message as Msg,
     CallbackQuery as BackQuery
 )
-User
-from hydrogram import Client, filters
-from hydrogram.types import (
-    InlineKeyboardButton as KeyboardButton,
-    InlineKeyboardMarkup as KeyboardMarkup,
-    Message as Msg,
-    CallbackQuery as BackQuery
-)
 from youtubedl import ytdl
 from youtubedl.database.mode_db import(
     get_normal_download_status,
