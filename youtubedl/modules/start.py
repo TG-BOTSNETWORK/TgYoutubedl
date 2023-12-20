@@ -41,7 +41,7 @@ async def start(client: Client, msg: Msg):
     user_id = msg.from_user.id
     normal_download_status = get_normal_download_status(user_id)
     playlist_download_status = get_playlist_download_status(user_id)
-    start_text = f"**👋Hello {msg.from_user.mention()}**\n\nWelcome, I am a YouTube downloader bot. I can download YouTube videos or audios by searching and providing links and playlist links.👀\n\n**Developed By**: @TgBotsNetwork\n\nNormal Download: {'✅ On' if get_normal_download_status == 'On' else '❌ Off'}\nPlaylist Download: {'✅ On' if get_playlist_download_status == 'On' else '❌ Off'}"
+    start_text = f"**👋Hello {msg.from_user.mention()}**\n\nWelcome, I am a YouTube downloader bot. I can download YouTube videos or audios by searching and providing links and playlist links.👀\n\n**Developed By**: @TgBotsNetwork\n\nNormal Download: {'✅ On' if normal_download_status == 'On' else '❌ Off'}\nPlaylist Download: {'✅ On' if playlist_download_status == 'On' else '❌ Off'}"
     await msg.reply_text(
         text=start_text,
         reply_markup=start_keyboard
@@ -84,11 +84,13 @@ async def help(client: Client, msg: Msg):
 
 @ytdl.on_callback_query(filters.regex("back"))
 async def back_callback(client: Client, callback_query: BackQuery):
+    user_id = callback_query.from_user.id
+    start_text = f"**👋Hello {callback_query.message.from_user.mention()}**\n\nWelcome, I am a YouTube downloader bot. I can download YouTube videos or audios by searching and providing links and playlist links.👀\n\n**Developed By**: @TgBotsNetwork\n\nNormal Download: {'✅ On' if get_normal_download_status(user_id) == 'On' else '❌ Off'}\nPlaylist Download: {'✅ On' if get_playlist_download_status(user_id) == 'On' else '❌ Off'}"
     await callback_query.edit_message_text(
-        text=f"**👋Hello {callback_query.msg.from_user.mention()}**\n\nWelcome, I am a YouTube downloader bot. I can download YouTube videos or audios by searching and providing links and playlist links.👀\n\n**Developed By**: @TgBotsNetwork\n\nNormal Download: {'✅ On' if get_normal_download_status == 'On' else '❌ Off'}\nPlaylist Download: {'✅ On' if get_playlist_download_status == 'On' else '❌ Off'}",
+        text=start_text,
         reply_markup=start_keyboard
     )
-
+    
 @ytdl.on_callback_query(filters.regex("help"))
 async def help(client: Client, callback_query: BackQuery):
     await callback_query.edit_message_text(
