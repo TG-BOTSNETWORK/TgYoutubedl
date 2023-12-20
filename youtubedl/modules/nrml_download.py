@@ -31,9 +31,10 @@ def get_video_info(video_id):
 
 def download_video(video_id, quality="best"):
     url = f"https://www.youtube.com/watch?v={video_id}"
+    video_info = get_video_info(video_id)
     ydl_opts = {
         "format": quality,
-        "outtmpl": f"{DOWNLOAD_DIR}/{video_id}.%(ext)s",
+        "outtmpl": f"{video_info['title']}.%(ext)s",
     }
     with YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
@@ -82,7 +83,7 @@ def download_video_callback(client, callback_query):
                 Button("Youtube", url=f"https://www.youtube.com/watch?v={video_id}")
                 ]]
                 )
-        file_path = f"{DOWNLOAD_DIR}/{video_info['title']}.mp4"
+        file_path = f"{video_info['title']}.mp4"
         time.sleep(0.1)
         msg.edit_text(chat_id, text="Uploading your video...")
         time.sleep(2)
@@ -94,6 +95,8 @@ def download_audio_callback(client, callback_query):
     video_id = callback_query.matches[0].group(1)
     chat_id = callback_query.message.chat.id
     msg = callback_query.message.edit_text("Wait! Searching for a video...")
+    time.sleep(0.1)
+    msg.edit_text("Founded your Video....")
     try:
         video_info = get_video_info(video_id)
         download_audio(video_id)
