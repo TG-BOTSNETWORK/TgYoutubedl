@@ -1,4 +1,4 @@
-from yutubedl.database import Connect
+from youtubedl.database import Connect
 
 
 create_download_status_table = """
