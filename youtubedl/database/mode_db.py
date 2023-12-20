@@ -7,7 +7,8 @@ user_mode = db["user_settings"]
 
 def get_normal_download_status(user_id):
     user_data = user_mode.find_one({"_id": user_id})
-    return user_data.get("normal_download", "Off") if user_data else "Off"
+    status = user_data.get("normal_download") if user_data else None
+    return status
 
 def set_normal_download_status(user_id, status):
     user_mode.update_one(
@@ -18,7 +19,8 @@ def set_normal_download_status(user_id, status):
 
 def get_playlist_download_status(user_id):
     user_data = user_mode.find_one({"_id": user_id})
-    return user_data.get("playlist_download", "Off") if user_data else "Off"
+    status = user_data.get("playlist_download") if user_data else None
+    return status
 
 def set_playlist_download_status(user_id, status):
     user_mode.update_one(
