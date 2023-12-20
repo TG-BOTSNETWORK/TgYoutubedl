@@ -62,8 +62,7 @@ async def plylist_dl_callback(client: Client, callback_query: BackQuery):
 @ytdl.on_callback_query(filters.regex(r"(?i)on|off"))
 async def on_off_callback(client: Client, callback_query: BackQuery):
     user_id = callback_query.from_user.id
-    command, = callback_query.matches
-    command = command.lower()
+    command = callback_query.matches[0].lower()
     if command == "on":
         status_text = "✅ On"
     elif command == "off":
@@ -73,7 +72,6 @@ async def on_off_callback(client: Client, callback_query: BackQuery):
     elif callback_query.data.endswith("plylist_dl"):
         set_playlist_download_status(user_id, command)
     await callback_query.answer("Changed Current Settings", show_alert=True)
-
 
 @ytdl.on_message(filters.command("help") & filters.private)
 async def help(client: Client, msg: Msg):
