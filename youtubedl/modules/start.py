@@ -59,3 +59,9 @@ async def help(client: Client, callback_query: BackQuery):
         disable_web_page_preview=True,
         reply_markup=help_keyboard
     )
+
+@ytdl.on_message(filters.incoming)
+async def start(client: Client, msg: Msg):
+    await msg.reply_text(
+        text="No Command found or url error"
+    )
