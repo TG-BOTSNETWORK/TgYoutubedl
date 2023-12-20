@@ -46,9 +46,9 @@ def download_audio(video_id):
     with YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
         
-@ytdl.on_message(filters.regex(r"(https?://(?:www\.)?youtube\.com\S+)"))
+@ytdl.on_message(filters.regex(r"(https?://(?:www\.)?youtu\.be\S+|https?://(?:www\.)?youtube\.com\S+)"))
 def video_url(client, message):
-    url = message.matches[0].group(1)
+    url = message.matches[0].group(0)
     video_id = extract_video_id(url)
     hmm = message.reply_text("Processing your query")
     hmm.edit_text("Sending Audio Video Modes....")
