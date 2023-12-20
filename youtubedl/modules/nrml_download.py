@@ -12,9 +12,6 @@ import re
 import asyncio
 import time
 
-DOWNLOAD_DIR = "downloads/"
-os.makedirs(DOWNLOAD_DIR, exist_ok=True)
-
 
 def extract_video_id(url):
     match = re.search(r"(?:v=|\/videos\/|embed\/|youtu.be\/|\/v\/|\/e\/|watch\?v=|&v=|%2Fvideos%2F|%2Fwatch%3Fv%3D|%2F|\?v=)([^#\\&\?]*)(?:[\w-]+)?", url)
@@ -84,11 +81,22 @@ def download_video_callback(client, callback_query):
                 ]]
                 )
         file_path = f"{video_info['title']}.mp4"
+        thumb_path = f"{video_info['title']}.jpg"  # Path to save the thumbnail
+        with open(thumb_path, "wb") as thumb_file:
+            thumb_file.write(requests.get(video_info['thumbnails'][-1]['url']).content)
         time.sleep(0.1)
-        msg.edit_text("Uploading your video...")
+        msg.edit_text(chat_id, text="Uploading your video...")
         time.sleep(2)
-        ytdl.send_video(chat_id, video=file_path, caption=f"Here is your video: {video_info['title']}\n\nDeveloped By: @my_name_is_nobitha", reply_markup=share_keyboard)
+        ytdl.send_video(
+            chat_id,
+            video=file_path,
+            caption=f"**Here is your video:** {video_info['title']}\n\n**Developed By:** @my_name_is_nobitha",
+            reply_markup=share_keyboard,
+            thumb=thumb_path,  
+        )
         os.remove(file_path)
+        os.remove(thumb_path)  
+
 
 @ytdl.on_callback_query(filters.regex(r"download_audio:(\S+)"))
 def download_audio_callback(client, callback_query):
@@ -108,7 +116,7 @@ def download_audio_callback(client, callback_query):
                     Button("Youtube", url=f"https://www.youtube.com/watch?v={video_id}")
                 ]])
                 msg.edit_text("Uploading Your Audio....")
-                ytdl.send_audio(chat_id, audio=audio_file, caption=f"**Here is your audio:** {video_info['title']}\n\nDeveloped By: @my_name_is_nobitha", reply_markup=share_keyboard)
+                ytdl.send_audio(chat_id, audio=audio_file, caption=f"**Here is your audio:** {video_info['title']}\n\n**Developed By:** @my_name_is_nobitha", reply_markup=share_keyboard)
                 os.remove(file_path)
         else:
             msg.edit_text("Error: Audio file not found.")
