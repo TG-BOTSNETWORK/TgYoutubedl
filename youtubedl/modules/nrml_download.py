@@ -46,10 +46,10 @@ def download_audio(video_id):
     with YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
         
-@ytdl.on_message(filters.text & ~filters.command(["start", "help", "stats", "broadcast", "settings"]))
-def handle_text_message(client, message):
-    query = message.text.strip()
-    video_id = extract_video_id(query)
+@ytdl.on_message(filters.regex(r"(https?://(?:www\.)?youtube\.com\S+)"))
+def video_url(client, message):
+    url = message.matches[0].group(1)
+    video_id = extract_video_id(url)
     hmm = message.reply_text("Processing your query")
     hmm.edit_text("Sending Audio Video Modes....")
     if video_id:
@@ -57,12 +57,13 @@ def handle_text_message(client, message):
         thumbnail_url = video_info["thumbnails"][-1]["url"]
 
         reply_markup = Markup([
-            [Button("Video", callback_data=f"download_video:{video_id}:video"),
-             Button("Audio", callback_data=f"download_audio:{video_id}:audio")]
+            [Button("🎥 Video", callback_data=f"download_video:{video_id}:video"),
+             Button("Audio 🎶", callback_data=f"download_audio:{video_id}:audio")]
         ])
 
         ytdl.send_photo(chat_id=message.chat.id, photo=thumbnail_url,
                           caption=f"{video_info['title']}\n\nChoose download type:", reply_markup=reply_markup)
+
 
 @ytdl.on_callback_query(filters.regex(r"download_video:(\S+):(\S+)"))
 def download_video_callback(client, callback_query):
@@ -77,11 +78,11 @@ def download_video_callback(client, callback_query):
     if download_type == "video":
         download_video(video_id, "best")
         share_keyboard = Markup([[
-                Button("Youtube", url=f"https://www.youtube.com/watch?v={video_id}")
+                Button("[▶️] Youtube", url=f"https://www.youtube.com/watch?v={video_id}")
                 ]]
                 )
         file_path = f"{video_info['title']}.mp4"
-        thumb_path = f"{video_info['title']}.jpg"  # Path to save the thumbnail
+        thumb_path = f"{video_info['title']}.jpg"
         with open(thumb_path, "wb") as thumb_file:
             thumb_file.write(requests.get(video_info['thumbnails'][-1]['url']).content)
         time.sleep(0.1)
@@ -113,7 +114,7 @@ def download_audio_callback(client, callback_query):
         if os.path.exists(file_path):
             with open(file_path, "rb") as audio_file:
                 share_keyboard = Markup([[
-                    Button("Youtube", url=f"https://www.youtube.com/watch?v={video_id}")
+                    Button("[▶️] Youtube", url=f"https://www.youtube.com/watch?v={video_id}")
                 ]])
                 msg.edit_text("Uploading Your Audio....")
                 ytdl.send_audio(chat_id, audio=audio_file, caption=f"**Here is your audio:** {video_info['title']}\n\n**Developed By:** @my_name_is_nobitha", reply_markup=share_keyboard)
