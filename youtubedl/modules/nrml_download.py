@@ -102,10 +102,7 @@ def download_audio_callback(client, callback_query):
     msg.edit_text("Found your audio....")
     time.sleep(0.1)
     msg.edit_text("URL checking....")
-
-    # Retrieve video information
-    video_info = get_video_info(video_id)
-    
+    video_info = get_video_info(video_id)   
     share_keyboard = Markup([[
         Button("Youtube", url=f"https://www.youtube.com/watch?v={video_id}")
     ]])
@@ -113,9 +110,10 @@ def download_audio_callback(client, callback_query):
     time.sleep(0.1)
     msg.edit_text("Uploading Your Audio....")
     time.sleep(2)
+
     if os.path.exists(file_path):
         with open(file_path, "rb") as audio_file:
             ytdl.send_audio(chat_id, audio=audio_file, caption=f"Here is your audio: {video_info['title']}\n\nDeveloped By: @my_name_is_nobitha", reply_markup=share_keyboard)
         os.remove(file_path)
     else:
-        ytdl.send_message(chat_id, text="Error: Audio file not found.")
+        msg.edit_text("Error: Audio file not found.")
