@@ -26,9 +26,16 @@ help_keyboard = KeyboardMarkup([[
     KeyboardButton("Back ⏎", callback_data="back")
 ]])
 
-on_off_buttons = KeyboardMarkup([[
-    KeyboardButton("✅ On", callback_data="on"),
-    KeyboardButton("Off ❌", callback_data="off"),
+playlist_on_off_buttons = KeyboardMarkup([[
+    KeyboardButton("✅ On", callback_data="playlist_dl_on"),
+    KeyboardButton("Off ❌", callback_data="playlist_dl_off"),
+], [
+    KeyboardButton("Back ⏎", callback_data="back")
+]])
+
+nrml_on_off_buttons = KeyboardMarkup([[
+    KeyboardButton("✅ On", callback_data="nrml_dl_on"),
+    KeyboardButton("Off ❌", callback_data="nrml_dl_off"),
 ], [
     KeyboardButton("Back ⏎", callback_data="back")
 ]])
@@ -50,33 +57,45 @@ async def start(_, msg: Msg):
 async def nrml_dl_callback(client: Client, callback_query: BackQuery):
     await callback_query.edit_message_text(
         text="Choose an On/Off button to change mode:",
-        reply_markup=on_off_buttons
+        reply_markup=nrml_on_off_buttons
     )
 
 @ytdl.on_callback_query(filters.regex("plylist_dl"))
 async def plylist_dl_callback(client: Client, callback_query: BackQuery):
     await callback_query.edit_message_text(
         text="Choose an On/Off button to change mode:",
-        reply_markup=on_off_buttons
+        reply_markup=playlist_on_off_buttons
     )
 
-@ytdl.on_callback_query(filters.regex(r"(?i)on|off"))
-async def on_off_callback(client: Client, callback_query: BackQuery):
+@ytdl.on_callback_query(filters.regex(r"(?i)playlist_dl_(on|off)"))
+async def playlist_dl_callback(client: Client, callback_query: BackQuery):
     user_id = callback_query.from_user.id
     command = callback_query.data
-    is_nrml = "nrml_dl" in command
-    mode = "nrml" if is_nrml else "playlist"
     status = True if "on" in command else False
     status_text = "✅ On" if status else "❌ Off"
-    if is_nrml:
-        save_on_off(user_id, normal_status=status)
-    else:
-        save_on_off(user_id, playlist_status=status)
+    save_on_off(user_id, normal_status=False, playlist_status=status)  
     status_nrml, status_playlist = get_is_on_off(user_id, mode="both")
-    status_text_nrml = f"Normal Download: {'✅ On' if status_nrml else '❌ Off'}"
+    status_text_nrml = f"Normal Download: {'❌ Off'}"  # Set normal status explicitly to '❌ Off'
     status_text_playlist = f"Playlist Download: {'✅ On' if status_playlist else '❌ Off'}"
-    start_text = f"**👋Hello {callback_query.message.from_user.mention()}**\n\nWelcome, I am a YouTube downloader bot. I can download YouTube videos or audios by searching and providing links and playlist links.👀\n\n**Developed By**: @TgBotsNetwork\n\n{status_text_nrml}\n{status_text_playlist}"
-    await callback_query.answer(f"Changed {mode.capitalize()} Download Settings: {status_text}", show_alert=True)
+    start_text = f"**👋Hello {callback_query.message.from_user.mention()}**\n\nWelcome, I am a YouTube downloader bot. I can download YouTube videos or audios by searching and providing links and playlist links.👀\n\n**Developed By**: @TgBotsNetwork\n\n{status_text_nrml}\n{status_text_playlist}"  
+    await callback_query.answer(f"Changed Playlist Download Settings: {status_text}", show_alert=True)
+    await callback_query.edit_message_text(
+        text=start_text,
+        reply_markup=start_keyboard
+    )
+
+@ytdl.on_callback_query(filters.regex(r"(?i)nrml_dl_(on|off)"))
+async def nrml_dl_callback(client: Client, callback_query: BackQuery):
+    user_id = callback_query.from_user.id
+    command = callback_query.data
+    status = True if "on" in command else False
+    status_text = "✅ On" if status else "❌ Off"
+    save_on_off(user_id, normal_status=status, playlist_status=False)  
+    status_nrml, _ = get_is_on_off(user_id, mode="both")
+    status_text_nrml = f"Normal Download: {'✅ On' if status_nrml else '❌ Off'}"
+    status_text_playlist = f"Playlist Download: {'❌ Off'}"  # Set playlist status explicitly to '❌ Off'
+    start_text = f"**👋Hello {callback_query.message.from_user.mention()}**\n\nWelcome, I am a YouTube downloader bot. I can download YouTube videos or audios by searching and providing links and playlist links.👀\n\n**Developed By**: @TgBotsNetwork\n\n{status_text_nrml}\n{status_text_playlist}"   
+    await callback_query.answer(f"Changed Normal Download Settings: {status_text}", show_alert=True)
     await callback_query.edit_message_text(
         text=start_text,
         reply_markup=start_keyboard
