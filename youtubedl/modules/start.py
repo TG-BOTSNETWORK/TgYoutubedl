@@ -5,16 +5,14 @@ from hydrogram.types import (
     Message as Msg,
     CallbackQuery as BackQuery
 )
-from youtubedl import ytdl
 from youtubedl.database.mode_db import (
     save_on_off,
     get_is_on_off
 )
-import capitalize
 
 start_keyboard = KeyboardMarkup([[
     KeyboardButton("📥 Normal Download", callback_data="nrml_dl"),
-    KeyboardButton("Playlist Download 📂 ", callback_data="plylist_dl"),
+    KeyboardButton("Playlist Download 📂 ", callback_data="playlist_dl"),
 ], [
     KeyboardButton("❐ About", callback_data="about"),
     KeyboardButton("Help 📗 ", callback_data="help"),
@@ -60,8 +58,8 @@ async def nrml_dl_callback(client: Client, callback_query: BackQuery):
         reply_markup=nrml_on_off_buttons
     )
 
-@ytdl.on_callback_query(filters.regex("plylist_dl"))
-async def plylist_dl_callback(client: Client, callback_query: BackQuery):
+@ytdl.on_callback_query(filters.regex("playlist_dl"))
+async def playlist_dl_callback(client: Client, callback_query: BackQuery):
     await callback_query.edit_message_text(
         text="Choose an On/Off button to change mode:",
         reply_markup=playlist_on_off_buttons
@@ -101,7 +99,6 @@ async def nrml_dl_callback(client: Client, callback_query: BackQuery):
             text=new_start_text,
             reply_markup=start_keyboard
         )
-
 
 @ytdl.on_message(filters.command("help") & filters.private)
 async def help(client: Client, msg: Msg):
