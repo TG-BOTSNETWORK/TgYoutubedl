@@ -7,8 +7,10 @@ from hydrogram.types import (
 )
 from youtubedl import ytdl
 from youtubedl.database.mode_db import (
-    save_on_off,
-    get_is_on_off
+    save_nrml_on_off,
+    save_playlist_on_off,
+    get_is_nrml__on_off,
+    get_is_playlist__on_off
 )
 
 start_keyboard = KeyboardMarkup([[
