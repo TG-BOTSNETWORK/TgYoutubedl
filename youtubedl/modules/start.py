@@ -38,12 +38,16 @@ on_off_buttons = KeyboardMarkup([[
 async def start(_, msg: Msg):
     user_id = msg.from_user.id
     status = get_is_on_off(user_id)
-    status_text = f"Normal Download: {'✅ On' if status['normal_download_status'] else '❌ Off'}\nPlaylist Download: {'✅ On' if status['playlist_download_status'] else '❌ Off'}"
+    if status is not None:
+        status_text = f"Normal Download: {'✅ On' if status['normal_download_status'] else '❌ Off'}\nPlaylist Download: {'✅ On' if status['playlist_download_status'] else '❌ Off'}"
+    else:
+        status_text = "Normal Download: ❌ Off\nPlaylist Download: ❌ Off"
     start_text = f"**👋Hello {msg.from_user.mention()}**\n\nWelcome, I am a YouTube downloader bot. I can download YouTube videos or audios by searching and providing links and playlist links.👀\n\n**Developed By**: @TgBotsNetwork\n\n{status_text}"
     await msg.reply_text(
         text=start_text,
         reply_markup=start_keyboard
     )
+
     
 @ytdl.on_callback_query(filters.regex("nrml_dl"))
 async def nrml_dl_callback(client: Client, callback_query: BackQuery):
@@ -80,8 +84,11 @@ async def help(client: Client, msg: Msg):
 @ytdl.on_callback_query(filters.regex("back"))
 async def back_callback(_, callback_query: BackQuery):
     user_id = callback_query.from_user.id
-    status = get_is_on_off(user_id)
-    status_text = f"Normal Download: {'✅ On' if status['normal_download_status'] else '❌ Off'}\nPlaylist Download: {'✅ On' if status['playlist_download_status'] else '❌ Off'}"
+    status = get_is_on_off(user_id)    
+    if status is not None:
+        status_text = f"Normal Download: {'✅ On' if status['normal_download_status'] else '❌ Off'}\nPlaylist Download: {'✅ On' if status['playlist_download_status'] else '❌ Off'}"
+    else:
+        status_text = "Normal Download: ❌ Off\nPlaylist Download: ❌ Off"
     start_text = f"**👋Hello {callback_query.message.from_user.mention()}**\n\nWelcome, I am a YouTube downloader bot. I can download YouTube videos or audios by searching and providing links and playlist links.👀\n\n**Developed By**: @TgBotsNetwork\n\n{status_text}"
     await callback_query.edit_message_text(
         text=start_text,
