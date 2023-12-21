@@ -36,10 +36,10 @@ on_off_buttons = KeyboardMarkup([[
 @ytdl.on_message(filters.command("start") & filters.private)
 async def start(_, msg: Msg):
     user_id = msg.from_user.id
-    status_nrml = get_is_on_off(user_id)
-    status_playlist = get_is_on_off(user_id)  
+    status_nrml = get_is_on_off(user_id, mode="nrml")
+    status_playlist = get_is_on_off(user_id, mode="playlist")
     status_text_nrml = f"Normal Download: {'✅ On' if status_nrml else '❌ Off'}"
-    status_text_playlist = f"Playlist Download: {'✅ On' if status_playlist else '❌ Off'}"    
+    status_text_playlist = f"Playlist Download: {'✅ On' if status_playlist else '❌ Off'}"
     start_text = f"**👋Hello {msg.from_user.mention()}**\n\nWelcome, I am a YouTube downloader bot. I can download YouTube videos or audios by searching and providing links and playlist links.👀\n\n**Developed By**: @TgBotsNetwork\n\n{status_text_nrml}\n{status_text_playlist}"  
     await msg.reply_text(
         text=start_text,
@@ -67,21 +67,22 @@ async def on_off_callback(client: Client, callback_query: BackQuery):
     mode = "nrml" if callback_query.data.endswith("nrml_dl") else "playlist"
     status = True if "on" in command else False
     status_text = "✅ On" if status else "❌ Off"
+
     if mode == "nrml":
-        save_on_off(user_id, status, playlist_status=None)
+        save_on_off(user_id, normal_status=status)
     else:
-        save_on_off(user_id, normal_status=None, playlist_status=status)
-    status_nrml = get_is_on_off(user_id)
-    status_playlist = get_is_on_off(user_id)
+        save_on_off(user_id, playlist_status=status)
+
+    status_nrml, status_playlist = get_is_on_off(user_id, mode="both")
     status_text_nrml = f"Normal Download: {'✅ On' if status_nrml else '❌ Off'}"
     status_text_playlist = f"Playlist Download: {'✅ On' if status_playlist else '❌ Off'}"
-    start_text = f"**👋Hello {callback_query.message.from_user.mention()}**\n\nWelcome, I am a YouTube downloader bot. I can download YouTube videos or audios by searching and providing links and playlist links.👀\n\n**Developed By**: @TgBotsNetwork\n\n{status_text_nrml}\n{status_text_playlist}"   
+    start_text = f"**👋Hello {callback_query.message.from_user.mention()}**\n\nWelcome, I am a YouTube downloader bot. I can download YouTube videos or audios by searching and providing links and playlist links.👀\n\n**Developed By**: @TgBotsNetwork\n\n{status_text_nrml}\n{status_text_playlist}"
+
     await callback_query.answer(f"Changed {mode.capitalize()} Download Settings: {status_text}", show_alert=True)
     await callback_query.edit_message_text(
         text=start_text,
         reply_markup=start_keyboard
     )
-
  
 @ytdl.on_message(filters.command("help") & filters.private)
 async def help(client: Client, msg: Msg):
@@ -93,10 +94,9 @@ async def help(client: Client, msg: Msg):
 @ytdl.on_callback_query(filters.regex("back"))
 async def back_callback(_, callback_query: BackQuery):
     user_id = callback_query.from_user.id
-    status_nrml = get_is_on_off(user_id)
-    status_playlist = get_is_on_off(user_id)  
+    status_nrml, status_playlist = get_is_on_off(user_id, mode="both")
     status_text_nrml = f"Normal Download: {'✅ On' if status_nrml else '❌ Off'}"
-    status_text_playlist = f"Playlist Download: {'✅ On' if status_playlist else '❌ Off'}"    
+    status_text_playlist = f"Playlist Download: {'✅ On' if status_playlist else '❌ Off'}"
     start_text = f"**👋Hello {callback_query.message.from_user.mention()}**\n\nWelcome, I am a YouTube downloader bot. I can download YouTube videos or audios by searching and providing links and playlist links.👀\n\n**Developed By**: @TgBotsNetwork\n\n{status_text_nrml}\n{status_text_playlist}"
     await callback_query.edit_message_text(
         text=start_text,
