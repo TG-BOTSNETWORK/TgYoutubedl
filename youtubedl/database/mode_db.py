@@ -1,4 +1,4 @@
-from youtubedl.database.connect import Connect
+from youtubedl.database import Connect
 
 create_download_status_table = """
 CREATE TABLE IF NOT EXISTS download_status (
