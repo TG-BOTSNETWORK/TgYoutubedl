@@ -14,6 +14,7 @@ import time
 import requests
 from pydub import AudioSegment
 from pydub.generators import Sine
+from PIL import Image
 
 def extract_video_id(url):
     match = re.search(r"(?:v=|\/videos\/|embed\/|youtu.be\/|\/v\/|\/e\/|watch\?v=|&v=|%2Fvideos%2F|%2Fwatch%3Fv%3D|%2F|\?v=)([^#\\&\?]*)(?:[\w-]+)?", url)
@@ -84,9 +85,8 @@ def download_video_callback(client, callback_query):
         file_path = f"{video_info['title']}.mp4"
         thumbnail_url = video_info["thumbnails"][-1]["url"]
         thumb_path = f"{video_info['title']}.jpg"
-        video = AudioSegment.from_file(file_path, format="mp4")
-        thumbnail = Sine(440).to_audio_segment()
-        thumbnail.export(thumb_path, format="jpeg")
+        thumbnail = Image.open(requests.get(thumbnail_url, stream=True).raw)
+        thumbnail.save(thumb_path, format="JPEG")
         time.sleep(0.1)
         msg.edit_text("Uploading your video...")
         time.sleep(2)
@@ -102,7 +102,7 @@ def download_video_callback(client, callback_query):
         )
         os.remove(file_path)
         os.remove(thumb_path)
-
+        
 @ytdl.on_callback_query(filters.regex(r"download_audio:(\S+)"))
 def download_audio_callback(client, callback_query):
     video_id = callback_query.matches[0].group(1)
