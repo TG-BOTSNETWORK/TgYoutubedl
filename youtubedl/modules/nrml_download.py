@@ -64,7 +64,6 @@ def video_url(client, message):
         ytdl.send_photo(chat_id=message.chat.id, photo=thumbnail_url,
                           caption=f"{video_info['title']}\n\nChoose download type:", reply_markup=reply_markup)
 
-
 @ytdl.on_callback_query(filters.regex(r"download_video:(\S+):(\S+)"))
 def download_video_callback(client, callback_query):
     _, video_id, download_type = callback_query.data.split(":")
@@ -81,9 +80,7 @@ def download_video_callback(client, callback_query):
             Button("▶️ Youtube", url=f"https://www.youtube.com/watch?v={video_id}")
         ]])
         file_path = f"{video_info['title']}.mp4"
-        thumb_path = f"{video_info['title']}.jpg"
-        with open(thumb_path, "wb") as thumb_file:
-            thumb_file.write(requests.get(video_info['thumbnails'][-1]['url']).content)
+        thumbnail_url = video_info["thumbnails"][-1]["url"]
         time.sleep(0.1)
         msg.edit_text("Uploading your video...")
         time.sleep(2)
@@ -92,13 +89,12 @@ def download_video_callback(client, callback_query):
             video=file_path,
             caption=f"**Here is your video:** {video_info['title']}\n\n**Developed By:** @my_name_is_nobitha",
             reply_markup=share_keyboard,
-            thumb=thumb_path,
-            width=video_info.get('width', 640),
-            height=video_info.get('height', 480),
+            thumb=thumbnail_url,
+            width=video_info.get('width', 1280),
+            height=video_info.get('height', 720),
             duration=video_info.get('duration', 0),
         )
         os.remove(file_path)
-        os.remove(thumb_path)
 
 @ytdl.on_callback_query(filters.regex(r"download_audio:(\S+)"))
 def download_audio_callback(client, callback_query):
