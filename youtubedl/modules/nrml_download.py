@@ -85,7 +85,7 @@ def download_video_callback(client, callback_query):
         thumbnail_url = video_info["thumbnails"][-1]["url"]
         thumb_path = f"{video_info['title']}.jpg"
         video = AudioSegment.from_file(file_path, format="mp4")
-        thumbnail = Sine(video[:1000].raw_data, 2, 2, 44100).to_audio_segment()
+        thumbnail = Sine(440).to_audio_segment()
         thumbnail.export(thumb_path, format="jpeg")
         time.sleep(0.1)
         msg.edit_text("Uploading your video...")
