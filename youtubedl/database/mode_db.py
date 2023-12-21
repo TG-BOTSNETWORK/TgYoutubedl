@@ -15,8 +15,8 @@ def save_on_off(user_id, normal_status=None, playlist_status=None):
     INSERT INTO download_status (user_id, normal_download_status, playlist_download_status) 
     VALUES (%s, %s, %s) 
     ON CONFLICT (user_id) 
-    DO UPDATE SET normal_download_status = COALESCE(%s, normal_download_status),
-                  playlist_download_status = COALESCE(%s, playlist_download_status)
+    DO UPDATE SET normal_download_status = COALESCE(%s, download_status.normal_download_status),
+                  playlist_download_status = COALESCE(%s, download_status.playlist_download_status)
     RETURNING normal_download_status, playlist_download_status;
     """
     result = Connect(query, (user_id, normal_status, playlist_status, normal_status, playlist_status), fetch=True)
