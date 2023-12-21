@@ -87,17 +87,15 @@ def download_video_callback(client, callback_query):
         time.sleep(0.1)
         msg.edit_text("Uploading your video...")
         time.sleep(2)
-        
-        # Send video with additional parameters
         ytdl.send_video(
             chat_id,
             video=file_path,
             caption=f"**Here is your video:** {video_info['title']}\n\n**Developed By:** @my_name_is_nobitha",
             reply_markup=share_keyboard,
             thumb=thumb_path,
-            width=video_info['width'],
-            height=video_info['height'],
-            duration=video_info['duration'],
+            width=video_info.get('width', 640),
+            height=video_info.get('height', 480),
+            duration=video_info.get('duration', 0),
         )
         os.remove(file_path)
         os.remove(thumb_path)
@@ -120,7 +118,12 @@ def download_audio_callback(client, callback_query):
                     Button("▶️Youtube", url=f"https://www.youtube.com/watch?v={video_id}")
                 ]])
                 msg.edit_text("Uploading Your Audio....")
-                ytdl.send_audio(chat_id, audio=audio_file, caption=f"**Here is your audio:** {video_info['title']}\n\n**Developed By:** @my_name_is_nobitha", reply_markup=share_keyboard)
+                ytdl.send_audio(
+                    chat_id,
+                    audio=audio_file,
+                    caption=f"**Here is your audio:** {video_info['title']}\n\n**Developed By:** @my_name_is_nobitha",
+                    reply_markup=share_keyboard
+                )
                 os.remove(file_path)
         else:
             msg.edit_text("Error: Audio file not found.")
