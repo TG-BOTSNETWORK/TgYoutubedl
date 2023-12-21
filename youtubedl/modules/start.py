@@ -6,40 +6,38 @@ from hydrogram.types import (
     CallbackQuery as BackQuery
 )
 from youtubedl import ytdl
-from youtubedl.database.mode_db import(
+from youtubedl.database.mode_db import (
     save_on_off,
     get_is_on_off
 )
-    
+
 start_keyboard = KeyboardMarkup([[
     KeyboardButton("📥 Normal Download", callback_data="nrml_dl"),
     KeyboardButton("Playlist Download 📂 ", callback_data="plylist_dl"),
-    ],[
+], [
     KeyboardButton("❐ About", callback_data="about"),
     KeyboardButton("Help 📗 ", callback_data="help"),
-    ],[
+], [
     KeyboardButton("⚙️ Settings", callback_data="settings")
-    ]]
-    )
+]])
 
 help_keyboard = KeyboardMarkup([[
     KeyboardButton("Back ⏎", callback_data="back")
-    ]]
-    )
+]])
 
 on_off_buttons = KeyboardMarkup([[
-     KeyboardButton("✅ On", callback_data="on"), 
-     KeyboardButton("Off ❌", callback_data="off"),
-     ],[
-     KeyboardButton("Back ⏎", callback_data="back")
-     ]])
+    KeyboardButton("✅ On", callback_data="on"),
+    KeyboardButton("Off ❌", callback_data="off"),
+], [
+    KeyboardButton("Back ⏎", callback_data="back")
+]])
 
 @ytdl.on_message(filters.command("start") & filters.private)
 async def start(_, msg: Msg):
     user_id = msg.from_user.id
     status = get_is_on_off(user_id)
     if status is not None:
-        status_text = f"Normal Download: {'✅ On' if status['normal_download_status'] else '❌ Off'}\nPlaylist Download: {'✅ On' if status['playlist_download_status'] else '❌ Off'}"
+        status_text = f"Normal Download: {'✅ On' if status[0] else '❌ Off'}\nPlaylist Download: {'✅ On' if status[1] else '❌ Off'}"
     else:
         status_text = "Normal Download: ❌ Off\nPlaylist Download: ❌ Off"
     start_text = f"**👋Hello {msg.from_user.mention()}**\n\nWelcome, I am a YouTube downloader bot. I can download YouTube videos or audios by searching and providing links and playlist links.👀\n\n**Developed By**: @TgBotsNetwork\n\n{status_text}"
@@ -48,7 +46,7 @@ async def start(_, msg: Msg):
         reply_markup=start_keyboard
     )
 
-    
+
 @ytdl.on_callback_query(filters.regex("nrml_dl"))
 async def nrml_dl_callback(client: Client, callback_query: BackQuery):
     await callback_query.edit_message_text(
@@ -62,11 +60,11 @@ async def plylist_dl_callback(client: Client, callback_query: BackQuery):
         text="Choose an On/Off button to change mode:",
         reply_markup=on_off_buttons
     )
-    
+
 @ytdl.on_callback_query(filters.regex(r"(?i)on|off"))
 async def on_off_callback(client: Client, callback_query: BackQuery):
     user_id = callback_query.from_user.id
-    command = callback_query.data  
+    command = callback_query.data
     if "on" in command:
         status_text = "✅ On"
     elif "off" in command:
@@ -84,9 +82,9 @@ async def help(client: Client, msg: Msg):
 @ytdl.on_callback_query(filters.regex("back"))
 async def back_callback(_, callback_query: BackQuery):
     user_id = callback_query.from_user.id
-    status = get_is_on_off(user_id)    
+    status = get_is_on_off(user_id)
     if status is not None:
-        status_text = f"Normal Download: {'✅ On' if status['normal_download_status'] else '❌ Off'}\nPlaylist Download: {'✅ On' if status['playlist_download_status'] else '❌ Off'}"
+        status_text = f"Normal Download: {'✅ On' if status[0] else '❌ Off'}\nPlaylist Download: {'✅ On' if status[1] else '❌ Off'}"
     else:
         status_text = "Normal Download: ❌ Off\nPlaylist Download: ❌ Off"
     start_text = f"**👋Hello {callback_query.message.from_user.mention()}**\n\nWelcome, I am a YouTube downloader bot. I can download YouTube videos or audios by searching and providing links and playlist links.👀\n\n**Developed By**: @TgBotsNetwork\n\n{status_text}"
@@ -94,7 +92,7 @@ async def back_callback(_, callback_query: BackQuery):
         text=start_text,
         reply_markup=start_keyboard
     )
-    
+
 @ytdl.on_callback_query(filters.regex("help"))
 async def help(client: Client, callback_query: BackQuery):
     await callback_query.edit_message_text(
