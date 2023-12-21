@@ -64,13 +64,15 @@ async def on_off_callback(client: Client, callback_query: BackQuery):
     user_id = callback_query.from_user.id
     command = callback_query.data
     mode = "nrml" if callback_query.data.endswith("nrml_dl") else "playlist"
-    status = True if "on" in command else False  
+    status = True if "on" in command else False
+    status = status if status is not None else False   
     if status:
         status_text = "✅ On"
     else:
-        status_text = "❌ Off"   
-    save_on_off(user_id, status, mode)  
+        status_text = "❌ Off"
+    save_on_off(user_id, status, mode)   
     await callback_query.answer(f"Changed {mode.capitalize()} Download Settings: {status_text}", show_alert=True)
+
     
 @ytdl.on_message(filters.command("help") & filters.private)
 async def help(client: Client, msg: Msg):
