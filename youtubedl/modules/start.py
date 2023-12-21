@@ -71,8 +71,8 @@ async def on_off_callback(client: Client, callback_query: BackQuery):
         save_on_off(user_id, status, playlist_status=None)
     else:
         save_on_off(user_id, normal_status=None, playlist_status=status)
-    status_nrml = get_is_on_off(user_id, mode="nrml")
-    status_playlist = get_is_on_off(user_id, mode="playlist")
+    status_nrml = get_is_on_off(user_id)
+    status_playlist = get_is_on_off(user_id)
     status_text_nrml = f"Normal Download: {'✅ On' if status_nrml else '❌ Off'}"
     status_text_playlist = f"Playlist Download: {'✅ On' if status_playlist else '❌ Off'}"
     start_text = f"**👋Hello {callback_query.message.from_user.mention()}**\n\nWelcome, I am a YouTube downloader bot. I can download YouTube videos or audios by searching and providing links and playlist links.👀\n\n**Developed By**: @TgBotsNetwork\n\n{status_text_nrml}\n{status_text_playlist}"   
