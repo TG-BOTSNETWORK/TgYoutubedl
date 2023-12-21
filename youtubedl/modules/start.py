@@ -10,6 +10,8 @@ from youtubedl.database.mode_db import (
     get_is_on_off
 )
 from youtubedl import ytdl
+import time
+from datetime import datetime
 
 start_keyboard = KeyboardMarkup([[
     KeyboardButton("📥 Normal Download", callback_data="nrml_dl"),
@@ -77,6 +79,7 @@ async def playlist_dl_callback(client: Client, callback_query: BackQuery):
     status_text_nrml = f"Normal Download: {'❌ Off'}"  # Set normal status explicitly to '❌ Off'
     status_text_playlist = f"Playlist Download: {'✅ On' if status_playlist else '❌ Off'}"
     start_text = f"**👋Hello {callback_query.message.from_user.mention()}**\n\nWelcome, I am a YouTube downloader bot. I can download YouTube videos or audios by searching and providing links and playlist links.👀\n\n**Developed By**: @TgBotsNetwork\n\n{status_text_nrml}\n{status_text_playlist}"  
+    start_text += f"\nLast edited: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
     await callback_query.answer(f"Changed Playlist Download Settings: {status_text}", show_alert=True)
     await callback_query.edit_message_text(
         text=start_text,
@@ -94,6 +97,7 @@ async def nrml_dl_callback(client: Client, callback_query: BackQuery):
     status_text_nrml = f"Normal Download: {'✅ On' if status_nrml else '❌ Off'}"
     status_text_playlist = f"Playlist Download: {'❌ Off'}"  # Set playlist status explicitly to '❌ Off'
     new_start_text = f"**👋Hello {callback_query.message.from_user.mention()}**\n\nWelcome, I am a YouTube downloader bot. I can download YouTube videos or audios by searching and providing links and playlist links.👀\n\n**Developed By**: @TgBotsNetwork\n\n{status_text_nrml}\n{status_text_playlist}"
+    new_start_text += f"\nLast edited: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
     await callback_query.answer(f"Changed Normal Download Settings: {status_text}", show_alert=True)
     await callback_query.edit_message_text(
         text=new_start_text,
