@@ -12,8 +12,6 @@ import re
 import asyncio
 import time
 import requests
-from pydub import AudioSegment
-from pydub.generators import Sine
 from PIL import Image
 
 def extract_video_id(url):
