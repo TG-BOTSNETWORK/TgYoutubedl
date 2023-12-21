@@ -37,9 +37,10 @@ on_off_buttons = KeyboardMarkup([[
 @ytdl.on_message(filters.command("start") & filters.private)
 async def start(_, msg: Msg):
     user_id = msg.from_user.id
-    status = get_is_on_off(user_id)
-    if status is not None:
-        status_text = f"Normal Download: {'✅ On' if status[0] else '❌ Off'}\nPlaylist Download: {'✅ On' if status[1] else '❌ Off'}"
+    status_nrml = get_is_nrml_on_off(user_id)
+    status_playlist = get_is_playlist_on_off(user_id)
+    if status_nrml is not None and status_playlist is not None:
+        status_text = f"Normal Download: {'✅ On' if status_nrml else '❌ Off'}\nPlaylist Download: {'✅ On' if status_playlist else '❌ Off'}"
     else:
         status_text = "Normal Download: ❌ Off\nPlaylist Download: ❌ Off"
     start_text = f"**👋Hello {msg.from_user.mention()}**\n\nWelcome, I am a YouTube downloader bot. I can download YouTube videos or audios by searching and providing links and playlist links.👀\n\n**Developed By**: @TgBotsNetwork\n\n{status_text}"
@@ -71,9 +72,12 @@ async def on_off_callback(client: Client, callback_query: BackQuery):
         status_text = "✅ On"
     elif "off" in command:
         status_text = "❌ Off"
-    save_on_off(user_id, "on" in command, "on" in command)
+    if callback_query.data.endswith("nrml_dl"):
+        save_nrml_on_off(user_id, "on" in command)
+    elif callback_query.data.endswith("plylist_dl"):
+        save_playlist_on_off(user_id, "on" in command)
     await callback_query.answer(f"Changed Current Settings: {status_text}", show_alert=True)
-
+    
 @ytdl.on_message(filters.command("help") & filters.private)
 async def help(client: Client, msg: Msg):
     await msg.reply_text(
@@ -84,9 +88,10 @@ async def help(client: Client, msg: Msg):
 @ytdl.on_callback_query(filters.regex("back"))
 async def back_callback(_, callback_query: BackQuery):
     user_id = callback_query.from_user.id
-    status = get_is_on_off(user_id)
-    if status is not None:
-        status_text = f"Normal Download: {'✅ On' if status[0] else '❌ Off'}\nPlaylist Download: {'✅ On' if status[1] else '❌ Off'}"
+    status_nrml = get_is_nrml_on_off(user_id)
+    status_playlist = get_is_playlist_on_off(user_id)
+    if status_nrml is not None and status_playlist is not None:
+        status_text = f"Normal Download: {'✅ On' if status_nrml else '❌ Off'}\nPlaylist Download: {'✅ On' if status_playlist else '❌ Off'}"
     else:
         status_text = "Normal Download: ❌ Off\nPlaylist Download: ❌ Off"
     start_text = f"**👋Hello {callback_query.message.from_user.mention()}**\n\nWelcome, I am a YouTube downloader bot. I can download YouTube videos or audios by searching and providing links and playlist links.👀\n\n**Developed By**: @TgBotsNetwork\n\n{status_text}"
