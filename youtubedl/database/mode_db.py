@@ -1,5 +1,4 @@
-from youtubedl.database import Connect
-
+from youtubedl.database.connect import Connect
 
 create_download_status_table = """
 CREATE TABLE IF NOT EXISTS download_status (
@@ -11,12 +10,22 @@ CREATE TABLE IF NOT EXISTS download_status (
 """
 Connect(create_download_status_table)
 
-def save_on_off(user_id, normal_status, playlist_status):
-    query = "INSERT INTO download_status (user_id, normal_download_status, playlist_download_status) VALUES (%s, %s, %s) ON CONFLICT (user_id) DO UPDATE SET normal_download_status = %s, playlist_download_status = %s RETURNING normal_download_status, playlist_download_status;"
-    result = Connect(query, (user_id, normal_status, playlist_status, normal_status, playlist_status), fetch=True)
-    return result[0] if result else None
+def save_nrml_on_off(user_id, status):
+    query = "INSERT INTO download_status (user_id, normal_download_status, playlist_download_status) VALUES (%s, %s, false) ON CONFLICT (user_id) DO UPDATE SET normal_download_status = %s RETURNING normal_download_status;"
+    result = Connect(query, (user_id, status, status), fetch=True)
+    return result[0][0] if result else None
 
-def get_is_on_off(user_id):
-    query = "SELECT normal_download_status, playlist_download_status FROM download_status WHERE user_id = %s;"
+def save_playlist_on_off(user_id, status):
+    query = "INSERT INTO download_status (user_id, normal_download_status, playlist_download_status) VALUES (%s, false, %s) ON CONFLICT (user_id) DO UPDATE SET playlist_download_status = %s RETURNING playlist_download_status;"
+    result = Connect(query, (user_id, status, status), fetch=True)
+    return result[0][0] if result else None
+
+def get_is_nrml_on_off(user_id):
+    query = "SELECT normal_download_status FROM download_status WHERE user_id = %s;"
     result = Connect(query, (user_id,), fetch=True)
-    return result[0] if result else None
+    return result[0][0] if result else None
+
+def get_is_playlist_on_off(user_id):
+    query = "SELECT playlist_download_status FROM download_status WHERE user_id = %s;"
+    result = Connect(query, (user_id,), fetch=True)
+    return result[0][0] if result else None
