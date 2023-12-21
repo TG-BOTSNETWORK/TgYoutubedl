@@ -23,9 +23,9 @@ def save_playlist_on_off(user_id, status):
 def get_is_nrml_on_off(user_id):
     query = "SELECT normal_download_status FROM download_status WHERE user_id = %s;"
     result = Connect(query, (user_id,), fetch=True)
-    return result[0][0] if result else None
+    return result[0] if result else None
 
 def get_is_playlist_on_off(user_id):
     query = "SELECT playlist_download_status FROM download_status WHERE user_id = %s;"
     result = Connect(query, (user_id,), fetch=True)
-    return result[0][0] if result else None
+    return result[0] if result else None
