@@ -9,3 +9,4 @@ youtube-search
 asyncio
 requests
 psycopg2
+capitalize
