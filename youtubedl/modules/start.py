@@ -1,4 +1,3 @@
-import pymongo
 from hydrogram import Client, filters
 from hydrogram.types import (
     InlineKeyboardButton as KeyboardButton,
