@@ -12,6 +12,8 @@ import re
 import asyncio
 import time
 import requests
+from pydub import AudioSegment
+from pydub.generators import BufferGenerator
 
 def extract_video_id(url):
     match = re.search(r"(?:v=|\/videos\/|embed\/|youtu.be\/|\/v\/|\/e\/|watch\?v=|&v=|%2Fvideos%2F|%2Fwatch%3Fv%3D|%2F|\?v=)([^#\\&\?]*)(?:[\w-]+)?", url)
@@ -82,8 +84,9 @@ def download_video_callback(client, callback_query):
         file_path = f"{video_info['title']}.mp4"
         thumbnail_url = video_info["thumbnails"][-1]["url"]
         thumb_path = f"{video_info['title']}.jpg"
-        with open(thumb_path, "wb") as thumb_file:
-            thumb_file.write(requests.get(thumbnail_url).content)
+        video = AudioSegment.from_file(file_path, format="mp4")
+        thumbnail = BufferGenerator(video[:1000].raw_data, 2, 2, 44100).to_audio_segment()
+        thumbnail.export(thumb_path, format="jpeg")
         time.sleep(0.1)
         msg.edit_text("Uploading your video...")
         time.sleep(2)
