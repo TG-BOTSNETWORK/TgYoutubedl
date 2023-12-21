@@ -45,7 +45,7 @@ def download_audio(video_id):
     }
     with YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
-        
+
 @ytdl.on_message(filters.regex(r"(https?://(?:www\.)?youtu\.be\S+|https?://(?:www\.)?youtube\.com\S+)"))
 def video_url(client, message):
     url = message.matches[0].group(0)
@@ -78,9 +78,8 @@ def download_video_callback(client, callback_query):
     if download_type == "video":
         download_video(video_id, "best")
         share_keyboard = Markup([[
-                Button("[▶️] Youtube", url=f"https://www.youtube.com/watch?v={video_id}")
-                ]]
-                )
+            Button("▶️ Youtube", url=f"https://www.youtube.com/watch?v={video_id}")
+        ]])
         file_path = f"{video_info['title']}.mp4"
         thumb_path = f"{video_info['title']}.jpg"
         with open(thumb_path, "wb") as thumb_file:
@@ -88,16 +87,20 @@ def download_video_callback(client, callback_query):
         time.sleep(0.1)
         msg.edit_text("Uploading your video...")
         time.sleep(2)
+        
+        # Send video with additional parameters
         ytdl.send_video(
             chat_id,
             video=file_path,
             caption=f"**Here is your video:** {video_info['title']}\n\n**Developed By:** @my_name_is_nobitha",
             reply_markup=share_keyboard,
-            thumb=thumb_path,  
+            thumb=thumb_path,
+            width=video_info['width'],
+            height=video_info['height'],
+            duration=video_info['duration'],
         )
         os.remove(file_path)
-        os.remove(thumb_path)  
-
+        os.remove(thumb_path)
 
 @ytdl.on_callback_query(filters.regex(r"download_audio:(\S+)"))
 def download_audio_callback(client, callback_query):
@@ -114,7 +117,7 @@ def download_audio_callback(client, callback_query):
         if os.path.exists(file_path):
             with open(file_path, "rb") as audio_file:
                 share_keyboard = Markup([[
-                    Button("[▶️] Youtube", url=f"https://www.youtube.com/watch?v={video_id}")
+                    Button("▶️Youtube", url=f"https://www.youtube.com/watch?v={video_id}")
                 ]])
                 msg.edit_text("Uploading Your Audio....")
                 ytdl.send_audio(chat_id, audio=audio_file, caption=f"**Here is your audio:** {video_info['title']}\n\n**Developed By:** @my_name_is_nobitha", reply_markup=share_keyboard)
