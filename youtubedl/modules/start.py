@@ -40,7 +40,7 @@ async def start(_, msg: Msg):
     status_nrml = get_is_nrml_on_off(user_id)
     status_playlist = get_is_playlist_on_off(user_id)
     if status_nrml is not None and status_playlist is not None:
-        status_text = f"Normal Download: {'✅ On' if status_nrml else '❌ Off'}\nPlaylist Download: {'✅ On' if status_playlist else '❌ Off'}"
+        status_text = f"Normal Download: {'✅ On' if status_nrml[0] else '❌ Off'}\nPlaylist Download: {'✅ On' if status_playlist[0] else '❌ Off'}"
     else:
         status_text = "Normal Download: ❌ Off\nPlaylist Download: ❌ Off"
     start_text = f"**👋Hello {msg.from_user.mention()}**\n\nWelcome, I am a YouTube downloader bot. I can download YouTube videos or audios by searching and providing links and playlist links.👀\n\n**Developed By**: @TgBotsNetwork\n\n{status_text}"
@@ -48,7 +48,6 @@ async def start(_, msg: Msg):
         text=start_text,
         reply_markup=start_keyboard
     )
-
 
 @ytdl.on_callback_query(filters.regex("nrml_dl"))
 async def nrml_dl_callback(client: Client, callback_query: BackQuery):
@@ -91,7 +90,7 @@ async def back_callback(_, callback_query: BackQuery):
     status_nrml = get_is_nrml_on_off(user_id)
     status_playlist = get_is_playlist_on_off(user_id)
     if status_nrml is not None and status_playlist is not None:
-        status_text = f"Normal Download: {'✅ On' if status_nrml else '❌ Off'}\nPlaylist Download: {'✅ On' if status_playlist else '❌ Off'}"
+        status_text = f"Normal Download: {'✅ On' if status_nrml[0] else '❌ Off'}\nPlaylist Download: {'✅ On' if status_playlist[0] else '❌ Off'}"
     else:
         status_text = "Normal Download: ❌ Off\nPlaylist Download: ❌ Off"
     start_text = f"**👋Hello {callback_query.message.from_user.mention()}**\n\nWelcome, I am a YouTube downloader bot. I can download YouTube videos or audios by searching and providing links and playlist links.👀\n\n**Developed By**: @TgBotsNetwork\n\n{status_text}"
