@@ -10,3 +10,4 @@ asyncio
 requests
 psycopg2
 capitalize
+pydub
