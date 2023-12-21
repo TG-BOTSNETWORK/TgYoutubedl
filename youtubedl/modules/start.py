@@ -60,7 +60,7 @@ async def plylist_dl_callback(client: Client, callback_query: BackQuery):
         reply_markup=on_off_buttons
     )
 
-ytdl.on_callback_query(filters.regex(r"(?i)on|off"))
+@ytdl.on_callback_query(filters.regex(r"(?i)on|off"))
 async def on_off_callback(client: Client, callback_query: BackQuery):
     user_id = callback_query.from_user.id
     command = callback_query.data
