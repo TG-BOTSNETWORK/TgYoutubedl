@@ -27,7 +27,7 @@ def get_video_info(video_id):
     info = ydl.extract_info(url, download=False)
     return info
 
-def download_video(video_id, quality="best"):
+def download_video(video_id, quality="best[height<=1080]"):
     url = f"https://www.youtube.com/watch?v={video_id}"
     video_info = get_video_info(video_id)
     ydl_opts = {
