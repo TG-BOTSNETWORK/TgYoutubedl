@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS download_status (
 Connect(create_download_status_table)
 
 def save_on_off(user_id, normal_status=None, playlist_status=None):
+    normal_status = normal_status if normal_status is not None else False
     query = """
     INSERT INTO download_status (user_id, normal_download_status, playlist_download_status) 
     VALUES (%s, %s, %s) 
@@ -21,6 +22,7 @@ def save_on_off(user_id, normal_status=None, playlist_status=None):
     """
     result = Connect(query, (user_id, normal_status, playlist_status, normal_status, playlist_status), fetch=True)
     return result[0] if result else None
+
 
 def get_is_on_off(user_id, mode=None):
     if mode == "nrml":
