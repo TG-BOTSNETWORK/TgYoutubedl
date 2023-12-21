@@ -81,6 +81,9 @@ def download_video_callback(client, callback_query):
         ]])
         file_path = f"{video_info['title']}.mp4"
         thumbnail_url = video_info["thumbnails"][-1]["url"]
+        thumb_path = f"{video_info['title']}.jpg"
+        with open(thumb_path, "wb") as thumb_file:
+            thumb_file.write(requests.get(thumbnail_url).content)
         time.sleep(0.1)
         msg.edit_text("Uploading your video...")
         time.sleep(2)
@@ -89,12 +92,13 @@ def download_video_callback(client, callback_query):
             video=file_path,
             caption=f"**Here is your video:** {video_info['title']}\n\n**Developed By:** @my_name_is_nobitha",
             reply_markup=share_keyboard,
-            thumb=thumbnail_url,
+            thumb=thumb_path,
             width=video_info.get('width', 1280),
             height=video_info.get('height', 720),
             duration=video_info.get('duration', 0),
         )
         os.remove(file_path)
+        os.remove(thumb_path)
 
 @ytdl.on_callback_query(filters.regex(r"download_audio:(\S+)"))
 def download_audio_callback(client, callback_query):
