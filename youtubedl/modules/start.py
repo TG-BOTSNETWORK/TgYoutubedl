@@ -64,26 +64,24 @@ async def plylist_dl_callback(client: Client, callback_query: BackQuery):
 async def on_off_callback(client: Client, callback_query: BackQuery):
     user_id = callback_query.from_user.id
     command = callback_query.data
-    mode = "nrml" if callback_query.data.endswith("nrml_dl") else "playlist"
+    is_nrml = "nrml_dl" in command
+    mode = "nrml" if is_nrml else "playlist"
     status = True if "on" in command else False
     status_text = "✅ On" if status else "❌ Off"
-
-    if mode == "nrml":
+    if is_nrml:
         save_on_off(user_id, normal_status=status)
     else:
         save_on_off(user_id, playlist_status=status)
-
     status_nrml, status_playlist = get_is_on_off(user_id, mode="both")
     status_text_nrml = f"Normal Download: {'✅ On' if status_nrml else '❌ Off'}"
     status_text_playlist = f"Playlist Download: {'✅ On' if status_playlist else '❌ Off'}"
     start_text = f"**👋Hello {callback_query.message.from_user.mention()}**\n\nWelcome, I am a YouTube downloader bot. I can download YouTube videos or audios by searching and providing links and playlist links.👀\n\n**Developed By**: @TgBotsNetwork\n\n{status_text_nrml}\n{status_text_playlist}"
-
     await callback_query.answer(f"Changed {mode.capitalize()} Download Settings: {status_text}", show_alert=True)
     await callback_query.edit_message_text(
         text=start_text,
         reply_markup=start_keyboard
     )
- 
+
 @ytdl.on_message(filters.command("help") & filters.private)
 async def help(client: Client, msg: Msg):
     await msg.reply_text(
