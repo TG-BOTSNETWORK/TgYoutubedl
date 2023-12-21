@@ -80,8 +80,8 @@ async def help(client: Client, msg: Msg):
 @ytdl.on_callback_query(filters.regex("back"))
 async def back_callback(_, callback_query: BackQuery):
     user_id = callback_query.from_user.id
-    status_nrml = get_is_on_off(user_id, "normal")
-    status_playlist = get_is_on_off(user_id, "playlist")
+    status_nrml = get_is_on_off(user_id)
+    status_playlist = get_is_on_off(user_id)
     status_text_nrml = f"Normal Download: {'✅ On' if status_nrml else '❌ Off'}"
     status_text_playlist = f"Playlist Download: {'✅ On' if status_playlist else '❌ Off'}"    
     start_text = f"**👋Hello {callback_query.message.from_user.mention()}**\n\nWelcome, I am a YouTube downloader bot. I can download YouTube videos or audios by searching and providing links and playlist links.👀\n\n**Developed By**: @TgBotsNetwork\n\n{status_text_nrml}\n{status_text_playlist}"
