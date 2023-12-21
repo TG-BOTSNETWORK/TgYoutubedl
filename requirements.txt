@@ -10,4 +10,4 @@ asyncio
 requests
 psycopg2
 capitalize
-git+https://github.com/TG-BOTSNETWORK/pydub@master
+
