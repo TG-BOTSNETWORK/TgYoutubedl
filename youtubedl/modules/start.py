@@ -70,7 +70,7 @@ async def on_off_callback(client: Client, callback_query: BackQuery):
     else:
         status_text = "❌ Off"   
     save_on_off(user_id, status, mode)  
-    await callback_query.answer(f"Changed {mode.capitalize()} Download Settings: {status_text}", show_alert=True))
+    await callback_query.answer(f"Changed {mode.capitalize()} Download Settings: {status_text}", show_alert=True)
     
 @ytdl.on_message(filters.command("help") & filters.private)
 async def help(client: Client, msg: Msg):
