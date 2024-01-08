@@ -8,6 +8,5 @@ pillow==9.5.0
 youtube-search
 asyncio
 requests
-psycopg2
 capitalize
-
+git+https://github.com/psycopg/psycopg2@master
