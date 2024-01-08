@@ -8,6 +8,6 @@ pillow==9.5.0
 youtube-search
 asyncio
 requests
-psycopg2-binary
+psycopg2
 capitalize
 
