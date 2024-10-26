@@ -9,4 +9,4 @@ youtube-search
 asyncio
 requests
 capitalize
-git+https://github.com/psycopg/psycopg2@master
+git+https://github.com/psycopg/psycopg2
