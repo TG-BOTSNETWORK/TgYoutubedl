@@ -87,7 +87,7 @@ async def download_video_callback(client, callback_query):
         thumbnail.save(thumb_path, format="JPEG")
         time.sleep(0.1)
         await msg.edit_text("Uploading your video...")
-        await time.sleep(2)
+        time.sleep(2)
         await ytdl.send_video(
             chat_id,
             video=file_path,
