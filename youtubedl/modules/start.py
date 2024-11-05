@@ -19,9 +19,7 @@ start_keyboard = KeyboardMarkup([[
 ], [
     KeyboardButton("❐ About", callback_data="about"),
     KeyboardButton("Help 📗 ", callback_data="help"),
-], [
-    KeyboardButton("⚙️ Settings", callback_data="settings")
-]])
+    ]])
 
 help_keyboard = KeyboardMarkup([[
     KeyboardButton("Back ⏎", callback_data="back")
