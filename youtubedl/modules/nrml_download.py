@@ -67,7 +67,7 @@ async def video_url(client, message):
 
 @ytdl.on_callback_query(filters.regex(r"download_video:(\S+):(\S+)"))
 async def download_video_callback(client, callback_query):
-    _, video_id, download_type = await callback_query.data.split(":")
+    _, video_id, download_type = callback_query.data.split(":")
     chat_id = await callback_query.message.chat.id
     msg = await callback_query.message.edit_text("Wait! Your Video is being found...")
     await time.sleep(0.1)
@@ -103,7 +103,7 @@ async def download_video_callback(client, callback_query):
         
 @ytdl.on_callback_query(filters.regex(r"download_audio:(\S+)"))
 async def download_audio_callback(client, callback_query):
-    video_id = await callback_query.matches[0].group(1)
+    video_id = callback_query.matches[0].group(1)
     chat_id = await callback_query.message.chat.id
     msg = await callback_query.message.edit_text("Wait! Searching for a video...")
     await time.sleep(0.1)
