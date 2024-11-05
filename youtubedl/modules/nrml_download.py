@@ -50,11 +50,11 @@ def download_audio(video_id):
 @ytdl.on_message(filters.regex(r"(https?://(?:www\.)?youtu\.be\S+|https?://(?:www\.)?youtube\.com\S+)"))
 async def video_url(client, message):
     url = message.matches[0].group(0)
-    video_id = await extract_video_id(url)
+    video_id = extract_video_id(url)
     hmm = await message.reply_text("Processing your query")
     await hmm.edit_text("Sending Audio Video Modes....")
     if video_id:
-        video_info = await get_video_info(video_id)
+        video_info = get_video_info(video_id)
         thumbnail_url = video_info["thumbnails"][-1]["url"]
 
         reply_markup = Markup([
