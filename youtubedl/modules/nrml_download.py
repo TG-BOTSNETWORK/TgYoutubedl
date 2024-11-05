@@ -102,7 +102,7 @@ async def download_video_callback(client, callback_query):
         os.remove(thumb_path)
         
 @ytdl.on_callback_query(filters.regex(r"download_audio:(\S+)"))
-def download_audio_callback(client, callback_query):
+async def download_audio_callback(client, callback_query):
     video_id = await callback_query.matches[0].group(1)
     chat_id = await callback_query.message.chat.id
     msg = await callback_query.message.edit_text("Wait! Searching for a video...")
