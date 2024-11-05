@@ -105,7 +105,7 @@ async def download_video_callback(client, callback_query):
 async def download_audio_callback(client, callback_query):
     video_id = callback_query.matches[0].group(1)
     chat_id = callback_query.message.chat.id
-    msg = await callback_query.message.edit_text("Wait! Searching for a video...")
+    msg = await callback_query.message.edit_text("Wait! Searching for a Audio...")
     await time.sleep(0.1)
     await msg.edit_text("Founded your Audio....")
     try:
