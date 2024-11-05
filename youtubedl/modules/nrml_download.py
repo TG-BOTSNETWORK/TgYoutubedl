@@ -70,9 +70,9 @@ async def download_video_callback(client, callback_query):
     _, video_id, download_type = callback_query.data.split(":")
     chat_id = callback_query.message.chat.id
     msg = await callback_query.message.edit_text("Wait! Your Video is being found...")
-    await time.sleep(0.1)
+    time.sleep(0.1)
     await msg.edit_text("Found your Video....")
-    await time.sleep(0.1)
+    time.sleep(0.1)
     await msg.edit_text("URL checking....")
     video_info = get_video_info(video_id)
     if download_type == "video":
@@ -85,7 +85,7 @@ async def download_video_callback(client, callback_query):
         thumb_path = f"{video_info['title']}.jpg"
         thumbnail = Image.open(requests.get(thumbnail_url, stream=True).raw)
         thumbnail.save(thumb_path, format="JPEG")
-        await time.sleep(0.1)
+        time.sleep(0.1)
         await msg.edit_text("Uploading your video...")
         await time.sleep(2)
         await ytdl.send_video(
@@ -106,12 +106,12 @@ async def download_audio_callback(client, callback_query):
     video_id = callback_query.matches[0].group(1)
     chat_id = callback_query.message.chat.id
     msg = await callback_query.message.edit_text("Wait! Searching for a Audio...")
-    await time.sleep(0.1)
+    time.sleep(0.1)
     await msg.edit_text("Founded your Audio....")
     try:
         video_info = get_video_info(video_id)
         download_audio(video_id)
-        await time.sleep(2)
+        time.sleep(2)
         file_path = f"{video_info['title']}.mp3"
         if os.path.exists(file_path):
             with open(file_path, "rb") as audio_file:
