@@ -66,14 +66,14 @@ async def video_url(client, message):
                           caption=f"{video_info['title']}\n\nChoose download type:", reply_markup=reply_markup)
 
 @ytdl.on_callback_query(filters.regex(r"download_video:(\S+):(\S+)"))
-def download_video_callback(client, callback_query):
-    _, video_id, download_type = callback_query.data.split(":")
-    chat_id = callback_query.message.chat.id
-    msg = callback_query.message.edit_text("Wait! Your Video is being found...")
-    time.sleep(0.1)
-    msg.edit_text("Found your Video....")
-    time.sleep(0.1)
-    msg.edit_text("URL checking....")
+async def download_video_callback(client, callback_query):
+    _, video_id, download_type = await callback_query.data.split(":")
+    chat_id = await callback_query.message.chat.id
+    msg = await callback_query.message.edit_text("Wait! Your Video is being found...")
+    await time.sleep(0.1)
+    await msg.edit_text("Found your Video....")
+    await time.sleep(0.1)
+    await msg.edit_text("URL checking....")
     video_info = get_video_info(video_id)
     if download_type == "video":
         download_video(video_id, "best")
@@ -85,10 +85,10 @@ def download_video_callback(client, callback_query):
         thumb_path = f"{video_info['title']}.jpg"
         thumbnail = Image.open(requests.get(thumbnail_url, stream=True).raw)
         thumbnail.save(thumb_path, format="JPEG")
-        time.sleep(0.1)
-        msg.edit_text("Uploading your video...")
-        time.sleep(2)
-        ytdl.send_video(
+        await time.sleep(0.1)
+        await msg.edit_text("Uploading your video...")
+        await time.sleep(2)
+        await ytdl.send_video(
             chat_id,
             video=file_path,
             caption=f"**Here is your video:** {video_info['title']}\n\n**Developed By:** @my_name_is_nobitha",
@@ -103,23 +103,23 @@ def download_video_callback(client, callback_query):
         
 @ytdl.on_callback_query(filters.regex(r"download_audio:(\S+)"))
 def download_audio_callback(client, callback_query):
-    video_id = callback_query.matches[0].group(1)
-    chat_id = callback_query.message.chat.id
-    msg = callback_query.message.edit_text("Wait! Searching for a video...")
-    time.sleep(0.1)
-    msg.edit_text("Founded your Audio....")
+    video_id = await callback_query.matches[0].group(1)
+    chat_id = await callback_query.message.chat.id
+    msg = await callback_query.message.edit_text("Wait! Searching for a video...")
+    await time.sleep(0.1)
+    await msg.edit_text("Founded your Audio....")
     try:
         video_info = get_video_info(video_id)
         download_audio(video_id)
-        time.sleep(2)
+        await time.sleep(2)
         file_path = f"{video_info['title']}.mp3"
         if os.path.exists(file_path):
             with open(file_path, "rb") as audio_file:
                 share_keyboard = Markup([[
                     Button("▶️Youtube", url=f"https://www.youtube.com/watch?v={video_id}")
                 ]])
-                msg.edit_text("Uploading Your Audio....")
-                ytdl.send_audio(
+                await msg.edit_text("Uploading Your Audio....")
+                await ytdl.send_audio(
                     chat_id,
                     audio=audio_file,
                     caption=f"**Here is your audio:** {video_info['title']}\n\n**Developed By:** @my_name_is_nobitha",
@@ -127,6 +127,6 @@ def download_audio_callback(client, callback_query):
                 )
                 os.remove(file_path)
         else:
-            msg.edit_text("Error: Audio file not found.")
+            await msg.edit_text("Error: Audio file not found.")
     except Exception as e:
-        msg.edit_text(f"Error: {str(e)}")
+        await msg.edit_text(f"Error: {str(e)}")
