@@ -48,13 +48,13 @@ def download_audio(video_id):
         ydl.download([url])
 
 @ytdl.on_message(filters.regex(r"(https?://(?:www\.)?youtu\.be\S+|https?://(?:www\.)?youtube\.com\S+)"))
-def video_url(client, message):
-    url = message.matches[0].group(0)
-    video_id = extract_video_id(url)
-    hmm = message.reply_text("Processing your query")
-    hmm.edit_text("Sending Audio Video Modes....")
+async def video_url(client, message):
+    url = await message.matches[0].group(0)
+    video_id = await extract_video_id(url)
+    hmm = await message.reply_text("Processing your query")
+    await hmm.edit_text("Sending Audio Video Modes....")
     if video_id:
-        video_info = get_video_info(video_id)
+        video_info = await get_video_info(video_id)
         thumbnail_url = video_info["thumbnails"][-1]["url"]
 
         reply_markup = Markup([
@@ -62,7 +62,7 @@ def video_url(client, message):
              Button("Audio 🎶", callback_data=f"download_audio:{video_id}:audio")]
         ])
 
-        ytdl.send_photo(chat_id=message.chat.id, photo=thumbnail_url,
+        await ytdl.send_photo(chat_id=message.chat.id, photo=thumbnail_url,
                           caption=f"{video_info['title']}\n\nChoose download type:", reply_markup=reply_markup)
 
 @ytdl.on_callback_query(filters.regex(r"download_video:(\S+):(\S+)"))
