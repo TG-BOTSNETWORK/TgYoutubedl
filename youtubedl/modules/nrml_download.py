@@ -49,10 +49,19 @@ def download_audio(video_id):
 
 @ytdl.on_message(filters.regex(r"(https?://(?:www\.)?youtu\.be\S+|https?://(?:www\.)?youtube\.com\S+)"))
 async def video_url(client, message):
+    user_id = message.from_user.id
+    is_nrml_enabled = get_is_on_off(user_id, mode="nrml")
+
+    # Alert if normal mode is off
+    if not is_nrml_enabled:
+        await message.reply_text("Normal download mode is currently off. Please go back and turn it on.")
+        return
+
     url = message.matches[0].group(0)
     video_id = extract_video_id(url)
-    hmm = await message.reply_text("Processing your query")
-    await hmm.edit_text("Sending Audio Video Modes....")
+    hmm = await message.reply_text("Processing your query...")
+    await hmm.edit_text("Sending Audio/Video Options...")
+    
     if video_id:
         video_info = get_video_info(video_id)
         thumbnail_url = video_info["thumbnails"][-1]["url"]
@@ -63,7 +72,7 @@ async def video_url(client, message):
         ])
 
         await ytdl.send_photo(chat_id=message.chat.id, photo=thumbnail_url,
-                          caption=f"{video_info['title']}\n\nChoose download type:", reply_markup=reply_markup)
+                              caption=f"{video_info['title']}\n\nChoose download type:", reply_markup=reply_markup)
 
 @ytdl.on_callback_query(filters.regex(r"download_video:(\S+):(\S+)"))
 async def download_video_callback(client, callback_query):
