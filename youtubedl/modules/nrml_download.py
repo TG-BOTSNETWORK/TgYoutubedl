@@ -28,6 +28,7 @@ async def get_video_info(video_id):
     ydl_opts = {
         "quiet": True,
         "no_warnings": True,
+        "noplaylist": True,
         "format": "best",
     }
     loop = asyncio.get_event_loop()
@@ -41,7 +42,6 @@ async def download_file(video_id, download_type, chat_id, msg, quality="best[hei
     file_ext = "mp3" if download_type == "audio" else "mp4"
     file_path = f"{video_info['title']}.{file_ext}"
     
-    # Progress tracking
     progress_msg = await msg.edit_text("Starting download... [0%]")
     last_update = time.time()
     progress_data = {"percent": 0, "speed": 0, "eta": "N/A"}
@@ -49,18 +49,22 @@ async def download_file(video_id, download_type, chat_id, msg, quality="best[hei
     def progress_hook(d):
         nonlocal progress_data, last_update
         if d["status"] == "downloading":
-            percent = d.get("downloaded_bytes", 0) / d.get("total_bytes", 1) * 100
-            speed = d.get("speed", 0) / 1024 / 1024  # MB/s
-            eta = d.get("eta", "N/A")
+            total_bytes = d.get("total_bytes", d.get("total_bytes_estimate", 1))
+            percent = d.get("downloaded_bytes", 0) / total_bytes * 100
+            speed = (d.get("speed", 0) or 0) / 1024 / 1024  # MB/s, default to 0 if None
+            eta = d.get("eta", "Unknown")
             progress_data = {"percent": percent, "speed": speed, "eta": eta}
-            if time.time() - last_update >= 1:  # Update every second
+            if time.time() - last_update >= 1:
                 asyncio.create_task(update_progress(progress_msg, progress_data))
                 last_update = time.time()
 
     async def update_progress(msg, data):
         bar = "█" * int(data["percent"] // 10) + "░" * (10 - int(data["percent"] // 10))
         text = f"Downloading... [{bar}] {data['percent']:.1f}%\nSpeed: {data['speed']:.2f} MB/s | ETA: {data['eta']}s"
-        await msg.edit_text(text)
+        try:
+            await msg.edit_text(text)
+        except Exception:
+            pass  # Ignore edit failures (e.g., message deleted)
 
     ydl_opts = {
         "format": "bestaudio" if download_type == "audio" else quality,
@@ -69,6 +73,9 @@ async def download_file(video_id, download_type, chat_id, msg, quality="best[hei
         "noprogress": False,
         "progress_hooks": [progress_hook],
         "http_headers": {"User-Agent": "Mozilla/5.0"},
+        "noplaylist": True,
+        "concurrent_fragment_downloads": 4,  # Faster downloads for segmented videos
+        "socket_timeout": 10,  # Handle network hiccups
     }
 
     try:
@@ -131,6 +138,7 @@ async def download_callback(client, callback_query):
     download_type, video_id, _ = callback_query.data.split(":")
     chat_id = callback_query.message.chat.id
     msg = await callback_query.message.edit_text("Wait! Processing your request...")
+    file_path = None
 
     try:
         file_path, video_info = await download_file(video_id, download_type, chat_id, msg)
@@ -150,7 +158,7 @@ async def download_callback(client, callback_query):
                 duration=int(video_info.get('duration', 0)),
                 supports_streaming=True
             )
-            if thumb_path:
+            if thumb_path and os.path.exists(thumb_path):
                 os.remove(thumb_path)
         else:
             await msg.edit_text("Uploading your audio...")
@@ -165,9 +173,10 @@ async def download_callback(client, callback_query):
                     performer=video_info.get('uploader', 'Unknown')
                 )
 
-        os.remove(file_path)
+        if file_path and os.path.exists(file_path):
+            os.remove(file_path)
     except Exception as e:
         await msg.edit_text(f"Error: {str(e)}")
-        if os.path.exists(file_path):
+        if file_path and os.path.exists(file_path):
             os.remove(file_path)
         raise
