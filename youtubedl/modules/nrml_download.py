@@ -142,7 +142,7 @@ async def download_audio_callback(client, callback_query):
                     caption=f"**Here is your audio:** {video_info['title']}\n\n**Developed By:** @my_name_is_nobitha",
                     duration=int(video_info.get('duration', 0)),
                     thumb=thumb_path,
-                    performer=video_info.get('channel_name', 'Unknown')
+                    performer=video_info.get('channel_name', 'Unknown'),
                     reply_markup=share_keyboard
                 )
                 os.remove(file_path)
