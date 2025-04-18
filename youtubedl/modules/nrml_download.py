@@ -126,6 +126,7 @@ async def download_audio_callback(client, callback_query):
         download_audio(video_id)
         time.sleep(2)
         file_path = f"{video_info['title']}.mp3"
+        thumb_path = f"{video_info['title']}.jpg"
         if os.path.exists(file_path):
             with open(file_path, "rb") as audio_file:
                 share_keyboard = Markup([[
@@ -136,6 +137,8 @@ async def download_audio_callback(client, callback_query):
                     chat_id,
                     audio=audio_file,
                     caption=f"**Here is your audio:** {video_info['title']}\n\n**Developed By:** @my_name_is_nobitha",
+                    duration=int(video_info.get('duration', 0)),
+                    thumb=thumb_path,
                     reply_markup=share_keyboard
                 )
                 os.remove(file_path)
