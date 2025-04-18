@@ -1,39 +1,72 @@
-from youtubedl.database import Connect
+from pymongo import MongoClient
+from config.config import DB_URI as DATABASE_URL
 
-create_download_status_table = """
-CREATE TABLE IF NOT EXISTS download_status (
-    id SERIAL PRIMARY KEY,
-    user_id BIGINT UNIQUE NOT NULL,
-    normal_download_status BOOLEAN NOT NULL,
-    playlist_download_status BOOLEAN NOT NULL
-);
-"""
-Connect(create_download_status_table)
+def Connect(collection_name, operation, data=None, query=None, update=None, fetch=False):
+    client = MongoClient(DATABASE_URL)
+    db = client.get_database()
+    collection = db[collection_name]
+
+    try:
+        if operation == "insert":
+            result = collection.insert_one(data)
+            return result.inserted_id
+        elif operation == "find":
+            return list(collection.find(query)) if fetch else None
+        elif operation == "update":
+            result = collection.update_one(query, update, upsert=True)
+            return collection.find_one(query) if fetch else None
+    finally:
+        client.close()
+
+create_download_status_collection = {
+    "validator": {
+        "$jsonSchema": {
+            "bsonType": "object",
+            "required": ["user_id", "normal_download_status", "playlist_download_status"],
+            "properties": {
+                "user_id": {"bsonType": "int", "description": "must be an integer and is required"},
+                "normal_download_status": {"bsonType": "bool", "description": "must be a boolean and is required"},
+                "playlist_download_status": {"bsonType": "bool", "description": "must be a boolean and is required"}
+            }
+        }
+    }
+}
+Connect("download_status", "insert", create_download_status_collection)
 
 def save_on_off(user_id, normal_status=None, playlist_status=None):
     normal_status = normal_status if normal_status is not None else False
-    query = """
-    INSERT INTO download_status (user_id, normal_download_status, playlist_download_status) 
-    VALUES (%s, %s, %s) 
-    ON CONFLICT (user_id) 
-    DO UPDATE SET normal_download_status = COALESCE(%s, download_status.normal_download_status),
-                  playlist_download_status = COALESCE(%s, download_status.playlist_download_status)
-    RETURNING normal_download_status, playlist_download_status;
-    """
-    result = Connect(query, (user_id, normal_status, playlist_status, normal_status, playlist_status), fetch=True)
-    return result[0] if result else None
-
+    playlist_status = playlist_status if playlist_status is not None else False
+    query = {"user_id": user_id}
+    update = {
+        "$set": {
+            "normal_download_status": normal_status,
+            "playlist_download_status": playlist_status
+        }
+    }
+    result = Connect("download_status", "update", query=query, update=update, fetch=True)
+    return {
+        "normal_download_status": result["normal_download_status"],
+        "playlist_download_status": result["playlist_download_status"]
+    } if result else None
 
 def get_is_on_off(user_id, mode=None):
+    query = {"user_id": user_id}
+    projection = {}
     if mode == "nrml":
-        query = "SELECT normal_download_status FROM download_status WHERE user_id = %s;"
+        projection["normal_download_status"] = 1
     elif mode == "playlist":
-        query = "SELECT playlist_download_status FROM download_status WHERE user_id = %s;"
+        projection["playlist_download_status"] = 1
     else:
-        query = "SELECT normal_download_status, playlist_download_status FROM download_status WHERE user_id = %s;"
-    result = Connect(query, (user_id,), fetch=True)
-    if result and len(result[0]) == 1:
-        return result[0][0]
-    elif result and len(result[0]) == 2:
-        return result[0]
+        projection["normal_download_status"] = 1
+        projection["playlist_download_status"] = 1
+    projection["_id"] = 0
+    result = Connect("download_status", "find", query=query, fetch=True)
+    if result:
+        result = result[0]
+        if len(projection) == 2:  # Only one field + _id
+            return result.get("normal_download_status") or result.get("playlist_download_status")
+        return {
+            "normal_download_status": result["normal_download_status"],
+            "playlist_download_status": result["playlist_download_status"]
+        }
     return None
