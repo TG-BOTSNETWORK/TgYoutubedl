@@ -1,37 +1,20 @@
 from pymongo import MongoClient
-from config.config import DB_URI as DATABASE_URL
+
+# MongoDB connection
+client = MongoClient("mongodb+srv://VEEZWORKS:SANTHU7981@veezworks.stpqs.mongodb.net/?retryWrites=true&w=majority&appName=veezworks")
+db = client['pytgcalls_db']
 
 def Connect(collection_name, operation, data=None, query=None, update=None, fetch=False):
-    client = MongoClient(DATABASE_URL)
-    db = client.get_database()
     collection = db[collection_name]
 
-    try:
-        if operation == "insert":
-            result = collection.insert_one(data)
-            return result.inserted_id
-        elif operation == "find":
-            return list(collection.find(query)) if fetch else None
-        elif operation == "update":
-            result = collection.update_one(query, update, upsert=True)
-            return collection.find_one(query) if fetch else None
-    finally:
-        client.close()
-
-create_download_status_collection = {
-    "validator": {
-        "$jsonSchema": {
-            "bsonType": "object",
-            "required": ["user_id", "normal_download_status", "playlist_download_status"],
-            "properties": {
-                "user_id": {"bsonType": "int", "description": "must be an integer and is required"},
-                "normal_download_status": {"bsonType": "bool", "description": "must be a boolean and is required"},
-                "playlist_download_status": {"bsonType": "bool", "description": "must be a boolean and is required"}
-            }
-        }
-    }
-}
-Connect("download_status", "insert", create_download_status_collection)
+    if operation == "insert":
+        result = collection.insert_one(data)
+        return result.inserted_id
+    elif operation == "find":
+        return list(collection.find(query)) if fetch else None
+    elif operation == "update":
+        result = collection.update_one(query, update, upsert=True)
+        return collection.find_one(query) if fetch else None
 
 def save_on_off(user_id, normal_status=None, playlist_status=None):
     normal_status = normal_status if normal_status is not None else False
