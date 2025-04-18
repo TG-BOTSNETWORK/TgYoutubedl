@@ -126,7 +126,10 @@ async def download_audio_callback(client, callback_query):
         download_audio(video_id)
         time.sleep(2)
         file_path = f"{video_info['title']}.mp3"
+        thumbnail_url = video_info["thumbnails"][-1]["url"]
         thumb_path = f"{video_info['title']}.jpg"
+        thumbnail = Image.open(requests.get(thumbnail_url, stream=True).raw)
+        thumbnail.save(thumb_path, format="JPEG")
         if os.path.exists(file_path):
             with open(file_path, "rb") as audio_file:
                 share_keyboard = Markup([[
