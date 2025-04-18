@@ -44,7 +44,8 @@ async def download_file(video_id, download_type, chat_id, msg, quality="best[hei
     
     progress_msg = await msg.edit_text("Starting download... [0%]")
     last_update = time.time()
-    progress_data = {"percent": 0, "speed": 0, "eta": "N/A"}
+    progress_data = {"percent": 0, "speed": 0, "eta": "Calculating..."}
+    loop = asyncio.get_event_loop()
 
     def progress_hook(d):
         nonlocal progress_data, last_update
@@ -52,10 +53,10 @@ async def download_file(video_id, download_type, chat_id, msg, quality="best[hei
             total_bytes = d.get("total_bytes", d.get("total_bytes_estimate", 1))
             percent = d.get("downloaded_bytes", 0) / total_bytes * 100
             speed = (d.get("speed", 0) or 0) / 1024 / 1024  # MB/s, default to 0 if None
-            eta = d.get("eta", "Unknown")
+            eta = d.get("eta", "Calculating...")
             progress_data = {"percent": percent, "speed": speed, "eta": eta}
-            if time.time() - last_update >= 1:
-                asyncio.create_task(update_progress(progress_msg, progress_data))
+            if time.time() - last_update >= 1.5:  # Update every 1.5 seconds
+                asyncio.run_coroutine_threadsafe(update_progress(progress_msg, progress_data), loop)
                 last_update = time.time()
 
     async def update_progress(msg, data):
@@ -74,8 +75,9 @@ async def download_file(video_id, download_type, chat_id, msg, quality="best[hei
         "progress_hooks": [progress_hook],
         "http_headers": {"User-Agent": "Mozilla/5.0"},
         "noplaylist": True,
-        "concurrent_fragment_downloads": 4,  # Faster downloads for segmented videos
-        "socket_timeout": 10,  # Handle network hiccups
+        "concurrent_fragment_downloads": 4,
+        "socket_timeout": 10,
+        "retries": 3,  # Retry on network failures
     }
 
     try:
